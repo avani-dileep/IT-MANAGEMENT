@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% block title %}Project Portfolio{% endblock %}
+{% block page_title %}Operational Intelligence{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    {% for p in projects %}
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100 border-0 shadow-sm overflow-hidden card-hover">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-3 text-primary">
+                        <i data-feather="box" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <span
+                        class="badge {% if p.status == 'COMPLETED' %}bg-success bg-opacity-10 text-success{% else %}bg-primary bg-opacity-10 text-primary{% endif %} rounded-pill px-3 py-2 fw-bold small">
+                        {{ p.status|title }}
+                    </span>
+                </div>
+
+                <h5 class="fw-bold text-dark mb-2">{{ p.name }}</h5>
+                <p class="text-secondary small mb-4 line-clamp-2" style="min-height: 40px;">{{ p.description }}</p>
+
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between small mb-2">
+                        <span class="text-secondary fw-bold">Velocity</span>
+                        <span class="text-dark fw-bold">{{ p.calculate_progress|default:0 }}%</span>
+                    </div>
+                    <div class="progress rounded-pill overflow-hidden" style="height: 6px;">
+                        <div class="progress-bar bg-primary shadow-none" role="progressbar"
+                            style="--w: {{ p.calculate_progress|default:0 }}%; width: var(--w);"></div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-3 pt-3 border-top">
+                    <div class="flex-grow-1">
+                        <div class="d-flex -space-x-2">
+                            {% for m in p.team_members.all|slice:":3" %}
+                            <img src="https://ui-avatars.com/api/?name={{ m.username }}&background=random"
+                                class="rounded-circle border border-2 border-white shadow-sm"
+                                style="width: 28px; height: 28px;" title="{{ m.get_full_name|default:m.username }}">
+                            {% endfor %}
+                            {% if p.team_members.count > 3 %}
+                            <div class="rounded-circle bg-light border border-2 border-white d-flex align-items-center justify-content-center small fw-bold text-muted"
+                                style="width: 28px; height: 28px;">+{{ p.team_members.count|add:"-3" }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-dark rounded-pill px-3 fw-bold" data-bs-toggle="modal"
+                        data-bs-target="#projDetails{{ p.id }}">Analyze</button>
+                </div>
+
+                <!-- Premium Detail Modal -->
+                <div class="modal fade" id="projDetails{{ p.id }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                            <div class="modal-header border-0 p-4 pb-0">
+                                <h5 class="modal-title fw-bold">Project Specification</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body p-4">
+                                <div class="bg-light p-3 rounded-4 mb-4">
+                                    <h4 class="fw-bold text-dark mb-1">{{ p.name }}</h4>
+                                    <p class="text-secondary small mb-0">{{ p.description }}</p>
+                                </div>
+
+                                <div class="row g-3 mb-4">
+                                    <div class="col-6">
+                                        <div class="p-3 border rounded-3 bg-white">
+                                            <label
+                                                class="d-block small text-muted fw-bold text-uppercase mb-1">Initiated</label>
+                                            <div class="d-flex align-items-center gap-2 text-dark fw-medium">
+                                                <i data-feather="calendar" class="icon-sm text-primary"></i>
+                                                {{ p.start_date|date:"M d, Y" }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="p-3 border rounded-3 bg-white">
+                                            <label
+                                                class="d-block small text-muted fw-bold text-uppercase mb-1">Deadline</label>
+                                            <div class="d-flex align-items-center gap-2 text-dark fw-medium">
+                                                <i data-feather="flag" class="icon-sm text-danger"></i>
+                                                {{ p.end_date|date:"M d, Y" }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="small text-muted fw-bold text-uppercase d-block mb-3">Resource
+                                        Allocation</label>
+                                    <div class="d-flex flex-wrap gap-2 mb-4">
+                                        {% for m in p.team_members.all %}
+                                        <span
+                                            class="badge bg-white text-dark border p-2 px-3 rounded-3 fw-medium d-flex align-items-center gap-2">
+                                            <img src="https://ui-avatars.com/api/?name={{ m.username }}&size=16"
+                                                class="rounded-circle">
+                                            {{ m.get_full_name|default:m.username }}
+                                        </span>
+                                        {% empty %}
+                                        <div class="alert alert-soft-warning w-100 py-2 small">No active resources
+                                            assigned.</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="small text-muted fw-bold text-uppercase d-block mb-3">Task
+                                        Deliverables</label>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th class="extra-small text-muted text-uppercase">Task</th>
+                                                    <th class="extra-small text-muted text-uppercase">Assignee</th>
+                                                    <th class="extra-small text-muted text-uppercase text-end">Progress
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for t in p.tasks.all %}
+                                                <tr>
+                                                    <td>
+                                                        <div class="small fw-bold text-dark">{{ t.title }}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="extra-small text-muted">{{
+                                                            t.assigned_to.get_full_name|default:t.assigned_to.username
+                                                            }}</div>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <div
+                                                            class="small fw-bold {% if t.status == 'DONE' %}text-success{% elif t.status == 'IN_PROGRESS' %}text-primary{% else %}text-warning{% endif %}">
+                                                            {{ t.progress }}%
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr>
+                                                    <td colspan="3" class="text-center py-3">
+                                                        <div class="extra-small text-muted opacity-50">No tasks defined
+                                                            for this project.</div>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0 p-4 pt-0">
+                                <button type="button" class="btn btn-dark w-100 rounded-pill py-2"
+                                    data-bs-dismiss="modal">Close Brief</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <div class="py-5 opacity-50">
+            <i data-feather="clipboard" class="mb-3" style="width: 64px; height: 64px;"></i>
+            <h5 class="text-muted">Portfolio currently empty.</h5>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-clamp: 2;
+    }
+
+    .-space-x-2>*+* {
+        margin-left: -0.5rem;
+    }
+
+    .card-hover {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-hover:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}

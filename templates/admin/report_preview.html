@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Report Preview - {{ report_type }}{% endblock %}
+{% block content %}
+<div class="page-header px-4 py-4 d-flex justify-content-between align-items-center">
+    <div>
+        <h2 class="page-title">{{ report_type }} Preview</h2>
+        <div class="text-muted small">Generated on: {{ timestamp|date:"F d, Y H:i" }}</div>
+    </div>
+    <button onclick="window.print()" class="btn btn-primary d-print-none">
+        <i class="feather-printer me-2"></i>Print / Save as PDF
+    </button>
+</div>
+
+<div class="px-4">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-5">
+            <div class="text-center mb-5">
+                <h3 class="text-uppercase fw-bold">IT Company Management System</h3>
+                <h5 class="text-muted text-uppercase letter-spacing-1">{{ report_type }} Official Report</h5>
+                <hr style="width: 100px; margin: 20px auto; border-top: 3px solid #000;">
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            {% for header in headers %}
+                            <th class="text-uppercase small fw-bold">{{ header }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if report_type == 'Attendance' %}
+                        {% for r in records %}
+                        <tr>
+                            <td>{{ r.date }}</td>
+                            <td>{{ r.employee.get_full_name|default:r.employee.username }}</td>
+                            <td>{{ r.check_in|time:"H:i"|default:"--" }}</td>
+                            <td>{{ r.check_out|time:"H:i"|default:"--" }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% elif report_type == 'Projects' %}
+                        {% for r in records %}
+                        <tr>
+                            <td>{{ r.name }}</td>
+                            <td>{{ r.start_date }}</td>
+                            <td>{{ r.end_date }}</td>
+                            <td>{{ r.status }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-5 pt-5 d-flex justify-content-between">
+                <div class="text-center" style="width: 200px;">
+                    <hr>
+                    <p class="small text-muted">System Generated</p>
+                </div>
+                <div class="text-center" style="width: 200px;">
+                    <hr>
+                    <p class="small text-muted">Authorized Signature</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style nonce="{{ request.csp_nonce }}">
+    @media print {
+
+        .nxl-navigation,
+        .nxl-header,
+        .d-print-none,
+        .page-header {
+            display: none !important;
+        }
+
+        .nxl-container {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+        }
+
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block title %}Talent Pipeline{% endblock %}
+{% block page_title %}Recruitment & Hiring{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Active Job Requisitions</h4>
+        <p class="text-secondary small mb-0">Track hiring status and manage candidate portals across all departments.
+        </p>
+    </div>
+    <button class="btn btn-primary d-flex align-items-center gap-2 px-4 shadow-sm" data-bs-toggle="modal"
+        data-bs-target="#postJobModal">
+        <i data-feather="plus"></i> Create Opening
+    </button>
+</div>
+
+<!-- Premium Post Job Modal -->
+<div class="modal fade" id="postJobModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px;">
+            <div class="modal-header border-0 p-4 pb-0">
+                <h5 class="modal-title fw-bold">Post New Opportunity</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    {% load crispy_forms_tags %}
+                    <div class="bg-light p-4 rounded-4 mb-3 border border-dashed border-primary border-opacity-25">
+                        {{ form|crispy }}
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-outline-secondary px-4 me-2"
+                        data-bs-dismiss="modal">Discard</button>
+                    <button type="submit" class="btn btn-dark px-5 fw-bold shadow-lg">Publish Opening</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for job in jobs %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm overflow-hidden card-hover">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-3 text-primary mb-3">
+                        <i data-feather="briefcase" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    {% if job.is_active %}
+                    <span
+                        class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-bold small">Live</span>
+                    {% else %}
+                    <span
+                        class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2 fw-bold small">Closed</span>
+                    {% endif %}
+                </div>
+
+                <h5 class="fw-bold text-dark mb-2">{{ job.title }}</h5>
+                <p class="text-secondary small mb-4 line-clamp-3">{{ job.description }}</p>
+
+                <div class="d-flex align-items-center gap-3 mt-auto pt-4 border-top">
+                    <div class="small text-muted flex-grow-1">
+                        <i data-feather="calendar" class="icon-sm me-1"></i> {{ job.posted_on|date:"M d" }}
+                    </div>
+                    <button class="btn btn-sm btn-outline-dark rounded-pill px-4 fw-bold" data-bs-toggle="modal"
+                        data-bs-target="#viewApps{{ job.id }}">
+                        Monitor
+                    </button>
+                </div>
+
+                <!-- View Apps Modal -->
+                <div class="modal fade" id="viewApps{{ job.id }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow-lg profile-card" style="border-radius: 20px;">
+                            <div class="modal-header border-0 p-4 pb-0">
+                                <h5 class="modal-title fw-bold">Applicants: {{ job.title }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body p-4">
+                                <div class="table-responsive">
+                                    <table class="table table-sm align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th class="small text-muted text-uppercase">Applicant</th>
+                                                <th class="small text-muted text-uppercase">Status</th>
+                                                <th class="small text-muted text-uppercase text-end">Files</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for c in job.candidates.all %}
+                                            <tr>
+                                                <td>
+                                                    <div class="fw-bold small">{{ c.name }}</div>
+                                                    <div class="extra-small text-muted">{{ c.email }}</div>
+                                                </td>
+                                                <td>
+                                                    <span
+                                                        class="badge {% if c.status == 'HIRED' %}bg-success{% elif c.status == 'REJECTED' %}bg-danger{% else %}bg-primary{% endif %} bg-opacity-10 {% if c.status == 'HIRED' %}text-success{% elif c.status == 'REJECTED' %}text-danger{% else %}text-primary{% endif %} rounded-pill px-2 extra-small">
+                                                        {{ c.get_status_display }}
+                                                    </span>
+                                                </td>
+                                                <td class="text-end">
+                                                    <a href="{{ c.resume.url }}"
+                                                        class="btn btn-link btn-sm p-0 text-dark"
+                                                        title="Download Resume">
+                                                        <i data-feather="download" class="icon-sm"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="3" class="text-center py-4">
+                                                    <div class="opacity-50">
+                                                        <i data-feather="users" class="mb-2"></i>
+                                                        <p class="mb-0 extra-small">No applicants yet.</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0 p-4 pt-0">
+                                <button type="button" class="btn btn-dark w-100 rounded-pill py-2"
+                                    data-bs-dismiss="modal">Acknowledge</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <div class="py-5 bg-white rounded-5 shadow-sm border border-dashed">
+            <i data-feather="search" class="mb-3 text-muted opacity-25" style="width: 64px; height: 64px;"></i>
+            <h5 class="text-dark fw-bold">No Active Requisitions Found</h5>
+            <p class="text-secondary small">Start by creating a new job posting to attract global talent.</p>
+            <button class="btn btn-primary mt-2 rounded-pill px-4" data-bs-toggle="modal"
+                data-bs-target="#postJobModal">Initiate Hiring</button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-clamp: 3;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>agentix - PrebuiltUI</title>
+    <link rel="stylesheet" href="./output.css">
+    <link rel="shortcut icon" href="./assets/favicon.png" type="image/x-icon">
+</head>
+
+<body>
+    <nav
+        class="sticky top-0 z-50 flex items-center justify-between w-full h-18 px-6 md:px-16 lg:px-24 xl:px-32 backdrop-blur">
+        <a href="#!">
+            <img class="h-9 w-auto" width="138" height="36" alt="logo" src="./assets/logo.svg" />
+        </a>
+        <div class="hidden lg:flex items-center gap-8 transition duration-500">
+            <a href="#creations" class="hover:text-slate-300 transition">
+                Creations
+            </a>
+            <a href="#about" class="hover:text-slate-300 transition">
+                About
+            </a>
+            <a href="#testimonials" class="hover:text-slate-300 transition">
+                Testimonials
+            </a>
+            <a href="#contact" class="hover:text-slate-300 transition">
+                Contact
+            </a>
+        </div>
+        <div class="hidden lg:block space-x-3">
+            <button
+                class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 transition text-white rounded-md active:scale-95">
+                Get started
+            </button>
+            <button
+                class="hover:bg-slate-300/20 transition px-6 py-2 border border-slate-400 rounded-md active:scale-95">
+                Login
+            </button>
+        </div>
+        <button class="lg:hidden active:scale-90 transition" id="menu-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-menu size-6.5" aria-hidden="true">
+                <path d="M4 5h16"></path>
+                <path d="M4 12h16"></path>
+                <path d="M4 19h16"></path>
+            </svg>
+        </button>
+    </nav>
+
+    <div id="nav-links" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur flex flex-col items-center justify-center text-lg gap-8 lg:hidden transition-transform duration-400 -translate-x-full">
+        <a href="/#creations">
+            Creations
+        </a>
+        <a href="/#about">
+            About
+        </a>
+        <a href="/#testimonials">
+            Testimonials
+        </a>
+        <a href="/#contact">
+            Contact
+        </a>
+        <button id="close-menu" class="active:ring-3 active:ring-white aspect-square size-10 p-1 items-center justify-center bg-slate-100 hover:bg-slate-200 transition text-black rounded-md flex">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-x" aria-hidden="true">
+                <path d="M18 6 6 18"></path>
+                <path d="m6 6 12 12"></path>
+            </svg>
+        </button>
+    </div>
+    
+    <!-- Hero Section -->
+     <section class="flex flex-col items-center -mt-18">
+        <svg class="absolute -z-10 w-full -mt-40 md:mt-0" width="1440" height="676" viewBox="0 0 1440 676" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="-92" y="-948" width="1624" height="1624" rx="812" fill="url(#a)"></rect>
+            <defs>
+                <radialGradient id="a" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse"
+                    gradientTransform="rotate(90 428 292)scale(812)">
+                    <stop offset=".63" stop-color="#372AAC" stop-opacity="0"></stop>
+                    <stop offset="1" stop-color="#372AAC"></stop>
+                </radialGradient>
+            </defs>
+        </svg>
+        <a class="flex items-center mt-48 gap-2 border border-slate-600 text-gray-50 rounded-full px-4 py-2">
+            <div class="size-2.5 bg-green-500 rounded-full animate-pulse"></div>
+            <span>Book a live demo today</span>
+        </a>
+        <h1 class="text-center text-5xl leading-[68px] md:text-6xl md:leading-[70px] mt-4 font-semibold max-w-2xl">
+            Let's build AI agents together
+        </h1>
+        <p class="text-center text-base max-w-lg mt-2">
+            Our platform helps you build, test, and deliver faster — so you can focus on what matters.
+        </p>
+        <div class="flex items-center gap-4 mt-8">
+            <button class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 transition text-white active:scale-95 rounded-lg px-7 h-11">
+                Get started
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right size-5" aria-hidden="true">
+                    <path d="M5 12h14"></path>
+                    <path d="m12 5 7 7-7 7"></path>
+                </svg>
+            </button>
+            <button class="border border-slate-400 active:scale-95 hover:bg-white/10 transition rounded-lg px-8 h-11">
+                Book a demo
+            </button>
+        </div>
+        <figure class="relative w-full h-full [perspective:800px] mt-16 max-w-4xl mx-auto flex flex-col items-center justify-center">
+            <div class="relative [transform-style:preserve-3d] w-full max-w-4xl">
+                <img class="w-full rounded-[15px] will-change-transform [transform:translateZ(0)]" alt="hero section showcase" src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/hero/hero-section-showcase-2.png" />
+            </div>
+        </figure>
+    </section>
+
+    <!-- Our Creations Section -->
+    <section class="flex flex-col items-center" id="creations">
+        <div class="flex flex-col items-center mt-32">
+            <h2 class="text-center text-4xl font-semibold max-w-2xl">
+                Our latest
+                <span class="bg-gradient-to-t from-indigo-600 to-black p-1 bg-left inline-block bg-no-repeat">creation</span>
+            </h2>
+            <p class="text-center text-slate-400 max-w-lg mt-3">
+                A visual collection of our most recent works - each piece crafted with
+                intention, emotion, and style.
+            </p>
+        </div>
+        <div class="flex items-center gap-4 h-100 w-full max-w-5xl mt-18 mx-auto">
+            <div class="relative group flex-grow h-[400px] rounded-xl overflow-hidden hover:w-full w-56 transition-all duration-500">
+                <img class="h-full w-full object-cover object-center" alt="Prompt engineers"
+                    src="https://images.unsplash.com/photo-1543269865-0a740d43b90c?q=80&amp;w=800&amp;h=400&amp;auto=format&amp;fit=crop" />
+                <div class="absolute inset-0 flex flex-col justify-end p-10 text-white bg-black/50 transition-all duration-300 opacity-0 group-hover:opacity-100">
+                    <h1 class="text-3xl font-semibold">Prompt engineers</h1>
+                    <p class="text-sm mt-2">
+                        Bridging the gap between human intent and machine understanding
+                        through expert prompt design.
+                    </p>
+                </div>
+            </div>
+            <div class="relative group flex-grow h-[400px] rounded-xl overflow-hidden hover:w-full w-56 transition-all duration-500">
+                <img class="h-full w-full object-cover object-right" alt="Data scientists"
+                    src="https://images.unsplash.com/photo-1714976326351-0ecf0244f0fc?q=80&amp;w=800&amp;h=400&amp;auto=format&amp;fit=crop" />
+                <div class="absolute inset-0 flex flex-col justify-end p-10 text-white bg-black/50 transition-all duration-300 opacity-0 group-hover:opacity-100">
+                    <h1 class="text-3xl font-semibold">Data scientists</h1>
+                    <p class="text-sm mt-2">
+                        Turning data into actionable insights that drive intelligent
+                        innovation and growth.
+                    </p>
+                </div>
+            </div>
+            <div class="relative group flex-grow h-[400px] rounded-xl overflow-hidden hover:w-full w-56 transition-all duration-500">
+                <img class="h-full w-full object-cover object-center" alt="Software engineers"
+                    src="https://images.unsplash.com/photo-1736220690062-79e12ca75262?q=80&amp;w=800&amp;h=400&amp;auto=format&amp;fit=crop" />
+                <div class="absolute inset-0 flex flex-col justify-end p-10 text-white bg-black/50 transition-all duration-300 opacity-0 group-hover:opacity-100">
+                    <h1 class="text-3xl font-semibold">Software engineers</h1>
+                    <p class="text-sm mt-2">
+                        Building scalable and efficient systems that bring ideas to life
+                        through code.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="flex flex-col items-center" id="about">
+        <div class="flex flex-col items-center mt-32">
+            <h2 class="text-center text-4xl font-semibold max-w-2xl">
+                About our 
+                <span class="bg-gradient-to-t from-indigo-600 to-black p-1 bg-left inline-block bg-no-repeat">apps</span>
+            </h2>
+            <p class="text-center text-slate-400 max-w-lg mt-3">A visual collection of
+                our most recent works - each piece crafted with intention, emotion, and style.</p>
+        </div>
+        <div class="relative max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 px-8 md:px-0 mt-18">
+            <div class="py-10 border-b border-slate-700 md:py-0 md:border-r md:border-b-0 md:px-10">
+                <div class="size-10 p-2 bg-indigo-600/20 border border-indigo-600/30 rounded">
+                    <img alt="" src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/aboutSection/flashEmoji.png">
+                </div>
+                <div class="mt-5 space-y-2">
+                    <h3 class="text-base font-medium text-slate-200">Lightning-Fast Performance</h3>
+                    <p class="text-sm text-slate-400">Built with speed — minimal load times and optimized.</p>
+                </div>
+            </div>
+            <div class="py-10 border-b border-slate-700 md:py-0 lg:border-r md:border-b-0 md:px-10">
+                <div class="size-10 p-2 bg-indigo-600/20 border border-indigo-600/30 rounded">
+                    <img alt="" src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/aboutSection/colorsEmoji.png">
+                </div>
+                <div class="mt-5 space-y-2">
+                    <h3 class="text-base font-medium text-slate-200">Beautifully Designed Components</h3>
+                    <p class="text-sm text-slate-400">Modern, pixel-perfect UI components ready for any project.</p>
+                </div>
+            </div>
+            <div class="py-10 border-b border-slate-700 md:py-0 md:border-b-0 md:px-10">
+                <div class="size-10 p-2 bg-indigo-600/20 border border-indigo-600/30 rounded">
+                    <img alt="" src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/aboutSection/puzzelEmoji.png">
+                </div>
+                <div class="mt-5 space-y-2">
+                    <h3 class="text-base font-medium text-slate-200">Plug-and-Play Integration</h3>
+                    <p class="text-sm text-slate-400">Simple setup with support for React, Next.js and Tailwind css.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="flex flex-col items-center" id="testimonials">
+        <div class="flex flex-col items-center mt-32">
+            <h2 class="text-center text-4xl font-semibold max-w-2xl">Our
+                <span class="bg-gradient-to-t from-indigo-600 to-black p-1 bg-left inline-block bg-no-repeat">testimonials</span>
+            </h2>
+            <p class="text-center text-slate-400 max-w-lg mt-3">A visual collection of
+                our most recent works - each piece crafted with intention, emotion, and style.
+            </p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-18 max-w-6xl mx-auto">
+            <div class="group border border-slate-800 p-6 rounded-xl">
+                <p class="text-slate-100 text-base">Super clean and easy to use. These Tailwind + React components saved me
+                    hours of dev time!</p>
+                <div class="flex items-center gap-3 mt-8 group-hover:-translate-y-1 duration-300">
+                    <img class="size-10 rounded-full" alt="user image"
+                        src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&amp;w=200">
+                    <div>
+                        <h2 class="text-gray-200 font-medium">Richard Nelson</h2>
+                        <p class="text-indigo-500">AI Content Marketer</p>
+                    </div>
+                </div>
+            </div>
+            <div class="group border border-slate-800 p-6 rounded-xl">
+                <p class="text-slate-100 text-base">The design quality is top-notch. Perfect balance between simplicity and
+                    style. Highly recommend!
+                </p>
+                <div class="flex items-center gap-3 mt-8 group-hover:-translate-y-1 duration-300">
+                    <img class="size-10 rounded-full" alt="user image" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&amp;w=200">
+                    <div>
+                        <h2 class="text-gray-200 font-medium">Sophia Martinez</h2>
+                        <p class="text-indigo-500">UI/UX Designer</p>
+                    </div>
+                </div>
+            </div>
+            <div class="group border border-slate-800 p-6 rounded-xl">
+                <p class="text-slate-100 text-base">Absolutely love the reusability of these components. My workflow feels
+                    10x faster now.
+                </p>
+                <div class="flex items-center gap-3 mt-8 group-hover:-translate-y-1 duration-300">
+                    <img class="size-10 rounded-full" alt="user image"
+                        src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=200&amp;auto=format&amp;fit=crop&amp;q=60">
+                    <div>
+                        <h2 class="text-gray-200 font-medium">Ethan Roberts</h2>
+                        <p class="text-indigo-500">Frontend Developer</p>
+                    </div>
+                </div>
+            </div>
+            <div class="group border border-slate-800 p-6 rounded-xl">
+                <p class="text-slate-100 text-base">Clean, elegant, and efficient. These components are a dream for any
+                    modern web developer.
+                </p>
+                <div class="flex items-center gap-3 mt-8 group-hover:-translate-y-1 duration-300">
+                    <img class="size-10 rounded-full" alt="user image"
+                        src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200&amp;auto=format&amp;fit=crop&amp;q=60">
+                    <div>
+                        <h2 class="text-gray-200 font-medium">Isabella Kim</h2>
+                        <p class="text-indigo-500">Product Designer</p>
+                    </div>
+                </div>
+            </div>
+            <div class="group border border-slate-800 p-6 rounded-xl">
+                <p class="text-slate-100 text-base">I've tried dozens of UI kits, but this one just feels right. Everything
+                    works seamlessly.
+                </p>
+                <div class="flex items-center gap-3 mt-8 group-hover:-translate-y-1 duration-300">
+                    <img class="size-10 rounded-full" alt="user image"
+                        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&amp;w=100&amp;h=100&amp;auto=format&amp;fit=crop">
+                    <div>
+                        <h2 class="text-gray-200 font-medium">Liam Johnson</h2>
+                        <p class="text-indigo-500">Software Engineer</p>
+                    </div>
+                </div>
+            </div>
+            <div class="group border border-slate-800 p-6 rounded-xl">
+                <p class="text-slate-100 text-base">Brilliantly structured components with clean, modern styling. Makes
+                    development a joy!
+                </p>
+                <div class="flex items-center gap-3 mt-8 group-hover:-translate-y-1 duration-300">
+                    <img class="size-10 rounded-full" alt="user image"
+                        src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/userImage/userImage1.png">
+                    <div>
+                        <h2 class="text-gray-200 font-medium">Ava Patel</h2>
+                        <p class="text-indigo-500">Full Stack Developer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trusted Companies Section -->
+    <section class="flex flex-col items-center">
+        <div class="flex flex-col items-center mt-32">
+            <h2 class="text-center text-4xl font-semibold max-w-2xl" style="opacity: 1; transform: none;">Trusted 
+                <span class="bg-gradient-to-t from-indigo-600 to-black p-1 bg-left inline-block bg-no-repeat">companies</span>
+            </h2>
+            <p class="text-center text-slate-400 max-w-lg mt-3">A visual collection of
+                our most recent works - each piece crafted with intention, emotion, and style.
+            </p>
+        </div>
+        <div class="relative max-w-5xl py-20 md:py-26 mt-18 md:w-full overflow-hidden mx-2 md:mx-auto border border-indigo-900 flex flex-col md:flex-row items-center justify-between bg-gradient-to-br from-[#401B98]/5 to-[#180027]/10 rounded-3xl p-4 md:p-10 text-white">
+            <div class="absolute pointer-events-none top-10 -z-1 left-20 size-64 bg-gradient-to-br from-[#536DFF] to-[#4F39F6]/60 blur-[180px]"></div>
+            <div class="absolute pointer-events-none bottom-10 -z-1 right-20 size-64 bg-gradient-to-br from-[#536DFF] to-[#4F39F6]/60 blur-[180px]"></div>
+            <div class="flex flex-col items-center md:items-start max-md:text-center">
+                <a href="#!" class="group flex items-center gap-2 rounded-full text-sm p-1 pr-3 text-indigo-300 bg-indigo-200/15">
+                    <span class="bg-indigo-600 text-white text-xs px-3.5 py-1 rounded-full">NEW</span>
+                    <p class="flex items-center gap-1">
+                        <span>Try 30 days free trial option </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right group-hover:translate-x-0.5 transition duration-300">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </p>
+                </a>
+                <h1 class="text-3xl font-medium max-w-xl mt-5 bg-gradient-to-r from-white to-[#b6abff] text-transparent bg-clip-text">
+                    Trusted by leading companies.
+                </h1>
+                <p class="text-base text-slate-400 max-w-lg mt-4">
+                    Built to integrate effortlessly with your existing tools, frameworks and workflows — so you can move faster.
+                </p>
+                <button class="flex items-center gap-1 text-sm px-6 py-2.5 border border-indigo-400 hover:bg-indigo-300/10 active:scale-95 transition rounded-full mt-6">
+                    Read more
+                    <svg width="13" height="10" viewBox="0 0 13 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.4243 5.42426C12.6586 5.18995 12.6586 4.81005 12.4243 4.57574L8.60589 0.757359C8.37157 0.523045 7.99167 0.523045 7.75736 0.757359C7.52304 0.991674 7.52304 1.37157 7.75736 1.60589L11.1515 5L7.75736 8.39411C7.52304 8.62843 7.52304 9.00833 7.75736 9.24264C7.99167 9.47696 8.37157 9.47696 8.60589 9.24264L12.4243 5.42426ZM0 5L0 5.6L12 5.6V5V4.4L0 4.4L0 5Z" fill="white"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="md:-mr-16 max-md:mt-10">
+                <img class="max-w-xs md:max-w-sm" alt="" src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/trusted-brand/image-fc6e.png">
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="flex flex-col items-center" id="contact">
+        <div class="flex flex-col items-center mt-32">
+            <h2 class="text-center text-4xl font-semibold max-w-2xl">
+                Get in 
+                <span class="bg-gradient-to-t from-indigo-600 to-black p-1 bg-left inline-block bg-no-repeat">
+                    touch
+                </span>
+            </h2>
+            <p class="text-center text-slate-400 max-w-lg mt-3">
+                A visual collection of
+                our most recent works - each piece crafted with intention, emotion, and style.</p>
+        </div>
+        <form class="grid sm:grid-cols-2 gap-3 sm:gap-5 max-w-3xl mx-auto text-slate-400 mt-16 w-full">
+            <div>
+                <label class="font-medium text-slate-200">
+                    Your name
+                </label>
+                <input placeholder="Enter your name" class="w-full mt-2 p-3 outline-none border border-slate-700 rounded-lg focus-within:ring-1 transition focus:ring-indigo-600" type="text" name="name">
+            </div>
+            <div>
+                <label class="font-medium text-slate-200">
+                    Email id
+                </label>
+                <input placeholder="Enter your email" class="w-full mt-2 p-3 outline-none border border-slate-700 rounded-lg focus-within:ring-1 transition focus:ring-indigo-600" type="email" name="email">
+            </div>
+            <div class="sm:col-span-2">
+                <label class="font-medium text-slate-200">Message</label>
+                <textarea name="message" rows="8" placeholder="Enter your message" class="resize-none w-full mt-2 p-3 outline-none rounded-lg focus-within:ring-1 transition focus:ring-indigo-600 border border-slate-700"></textarea>
+            </div>
+            <button type="submit" class="w-max flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-full">
+                Submit
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right size-4.5" aria-hidden="true">
+                    <path d="M7 7h10v10"></path>
+                    <path d="M7 17 17 7"></path>
+                </svg>
+            </button>
+        </form>
+    </section>
+
+    <!-- Subscribe Section -->
+    <section class="flex flex-col items-center">
+        <div class="flex flex-col items-center mt-32">
+            <h2 class="text-center text-4xl font-semibold max-w-2xl">Subscribe 
+                <span class="bg-gradient-to-t from-indigo-600 to-black p-1 bg-left inline-block bg-no-repeat">newsletter</span></h2>
+            <p class="text-center text-slate-400 max-w-lg mt-3">A visual collection of
+                our most recent works - each piece crafted with intention, emotion, and style.</p>
+        </div>
+        <div class="flex items-center justify-center mt-10 border border-slate-700 focus-within:outline focus-within:outline-indigo-600 text-sm rounded-full h-14 max-w-xl w-full">
+            <input class="bg-transparent outline-none rounded-full px-4 h-full flex-1 placeholder:text-slate-400" placeholder="Enter your email address" type="text">
+            <button class="bg-indigo-600 text-white rounded-full h-11 mr-1 px-10 flex items-center justify-center hover:bg-indigo-700 active:scale-95 transition">
+                Subscribe
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="px-6 md:px-16 lg:px-24 xl:px-32 w-full text-sm text-slate-400 mt-40">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-14">
+            <div class="sm:col-span-2 lg:col-span-1">
+                <a href="https://prebuiltui.com?utm_source=agentix">
+                <img class="h-9 w-auto" width="138" height="36" alt="logo" src="./assets/logo.svg"></a>
+                <p class="text-sm/7 mt-6">
+                    PrebuiltUI is a free and open-source UI component library with over 300+
+                    beautifully crafted, customizable components built with Tailwind CSS.
+                </p>
+            </div>
+            <div class="flex flex-col lg:items-center lg:justify-center">
+                <div class="flex flex-col text-sm space-y-2.5">
+                    <h2 class="font-semibold mb-5 text-white">Company</h2>
+                    <a class="hover:text-slate-500 transition" href="#">
+                        About us
+                    </a>
+                    <a class="hover:text-slate-500 transition" href="#">
+                        Careers <span class="text-xs text-white bg-indigo-600 rounded-md ml-2 px-2 py-1">We’re hiring!</span>
+                    </a>
+                    <a class="hover:text-slate-500 transition" href="#">
+                        Contact us
+                    </a>
+                    <a class="hover:text-slate-500 transition" href="#">
+                        Privacy policy
+                    </a>
+                </div>
+            </div>
+            <div>
+                <h2 class="font-semibold text-white mb-5">Subscribe to our newsletter</h2>
+                <div class="text-sm space-y-6 max-w-sm">
+                    <p>The latest news, articles, and resources, sent to your inbox weekly.</p>
+                    <div class="flex items-center justify-center gap-2 p-2 rounded-md bg-slate-900">
+                        <input class="outline-none w-full max-w-64 py-2 rounded px-2" placeholder="Enter your email" type="email">
+                        <button class="bg-indigo-600 px-4 py-2 text-white rounded">
+                            Subscribe
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="py-4 text-center border-t mt-6 border-slate-700">
+            Copyright 2025 © <a href="https://prebuiltui.com/">PrebuiltUI</a> All Right Reserved. Distributed by <a href="https://themewagon.com/" target="_blank">ThemeWagon</a>
+        </p>
+    </footer>
+    <script src="./script.js"></script>
+</body>
+
+</html>

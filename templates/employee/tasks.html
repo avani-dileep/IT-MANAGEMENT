@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block title %}My Workflow{% endblock %}
+{% block page_title %}Operational Assignments{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 p-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="bg-primary bg-opacity-10 p-2 rounded-3 text-primary">
+                <i data-feather="terminal" style="width: 20px; height: 20px;"></i>
+            </div>
+            <h5 class="mb-0 fw-bold">Active Deliverables</h5>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light bg-opacity-50">
+                <tr>
+                    <th class="ps-4 py-3 border-0 text-secondary small text-uppercase">Task Information</th>
+                    <th class="py-3 border-0 text-secondary small text-uppercase">Project</th>
+                    <th class="py-3 border-0 text-secondary small text-uppercase">Due Date</th>
+                    <th class="py-3 border-0 text-secondary small text-uppercase">Status & Velocity</th>
+                    <th class="pe-4 py-3 border-0 text-secondary small text-uppercase text-end">Operations</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in tasks %}
+                <tr>
+                    <td class="ps-4 py-4">
+                        <div class="fw-bold text-dark">{{ t.title }}</div>
+                        <div class="small text-muted mt-1">Ref: TSK-{{ t.id|stringformat:"05d" }}</div>
+                    </td>
+                    <td class="py-4">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="p-1 px-2 rounded bg-light border small fw-bold text-primary">{{
+                                t.project.name|slice:":2"|upper }}</span>
+                            <span class="text-secondary small fw-medium">{{ t.project.name }}</span>
+                        </div>
+                    </td>
+                    <td class="py-4">
+                        <div class="small text-dark fw-medium">
+                            <i data-feather="calendar" class="icon-sm me-1 opacity-50"></i>
+                            {{ t.due_date|date:"M d, Y" }}
+                        </div>
+                    </td>
+                    <td class="py-4" style="width: 250px;">
+                        <div class="d-flex align-items-center mb-2">
+                            {% if t.status == 'DONE' %}
+                            <span
+                                class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 me-auto small">Completed</span>
+                            {% elif t.status == 'IN_PROGRESS' %}
+                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 me-auto small">In
+                                Motion</span>
+                            {% else %}
+                            <span
+                                class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 me-auto small">Backlog</span>
+                            {% endif %}
+                            <span class="small fw-bold">{{ t.progress }}%</span>
+                        </div>
+                        <div class="progress rounded-pill overflow-hidden" style="height: 6px;">
+                            <div class="progress-bar {% if t.status == 'DONE' %}bg-success{% elif t.status == 'IN_PROGRESS' %}bg-primary{% else %}bg-warning{% endif %}"
+                                role="progressbar" style="--w: {{ t.progress }}%; width: var(--w);"></div>
+                        </div>
+                    </td>
+                    <td class="pe-4 py-4 text-end">
+                        <button class="btn btn-sm btn-dark rounded-pill px-3 fw-bold" data-bs-toggle="modal"
+                            data-bs-target="#updateTask{{ t.id }}">
+                            <i data-feather="refresh-cw" class="icon-sm me-1"></i> Update
+                        </button>
+
+                        <!-- Premium Modal -->
+                        <div class="modal fade" id="updateTask{{ t.id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                                    <div class="modal-header border-0 p-4 pb-0">
+                                        <h5 class="modal-title fw-bold">Update Execution Matrix</h5>
+                                        <button type="button" class="btn-close shadow-none"
+                                            data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form action="{% url 'update_task_progress' t.id %}" method="POST">
+                                        {% csrf_token %}
+                                        <div class="modal-body p-4">
+                                            <div class="mb-4 bg-light p-3 rounded-4">
+                                                <div
+                                                    class="small text-muted mb-1 text-uppercase fw-bold letter-spacing-1">
+                                                    Current Task</div>
+                                                <div class="fw-bold text-dark">{{ t.title }}</div>
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label class="form-label small fw-bold text-dark">Completion Velocity
+                                                    (%)</label>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <input type="range" name="progress" class="form-range flex-grow-1"
+                                                        min="0" max="100" value="{{ t.progress }}"
+                                                        oninput="this.nextElementSibling.innerText = this.value + '%'">
+                                                    <span class="fw-bold text-primary" style="min-width: 45px;">{{
+                                                        t.progress }}%</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-1">
+                                                <label class="form-label small fw-bold text-dark">Deployment
+                                                    Status</label>
+                                                <select name="status"
+                                                    class="form-select border-0 bg-light rounded-3 p-3 shadow-none">
+                                                    <option value="TODO" {% if t.status=='TODO' %}selected{% endif %}>To
+                                                        Do / Backlog</option>
+                                                    <option value="IN_PROGRESS" {% if t.status=='IN_PROGRESS'
+                                                        %}selected{% endif %}>In Active Progress</option>
+                                                    <option value="DONE" {% if t.status=='DONE' %}selected{% endif %}>
+                                                        Completed & Archived</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-0 p-4 pt-0">
+                                            <button type="submit"
+                                                class="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-lg">Save
+                                                Progression</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-5">
+                        <div class="py-4 opacity-50">
+                            <i data-feather="layers" class="mb-3" style="width: 48px; height: 48px;"></i>
+                            <p class="mb-0">Your task queue is currently empty.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

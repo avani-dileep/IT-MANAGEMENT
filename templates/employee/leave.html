@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Leave Application{% endblock %}
+{% block content %}
+<div class="page-header px-4 py-4">
+    <h2 class="page-title">Leave Management</h2>
+</div>
+
+<div class="px-4">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Apply for Leave</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {% load crispy_forms_tags %}
+                        {{ form|crispy }}
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary w-100">Submit Request</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">My Leave Requests</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Dates</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for l in leaves %}
+                            <tr>
+                                <td>{{ l.leave_type }}</td>
+                                <td>{{ l.start_date }} to {{ l.end_date }}</td>
+                                <td>
+                                    {% if l.status == 'PENDING' %}
+                                    <span class="badge bg-soft-warning text-warning">{{ l.status }}</span>
+                                    {% elif l.status == 'APPROVED' %}
+                                    <span class="badge bg-soft-success text-success">{{ l.status }}</span>
+                                    {% elif l.status == 'CANCELLED' %}
+                                    <span class="badge bg-soft-secondary text-secondary">{{ l.status }}</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-danger text-danger">{{ l.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if l.status == 'PENDING' %}
+                                    <a href="{% url 'cancel_leave' l.id %}"
+                                        class="btn btn-sm btn-outline-danger">Cancel</a>
+                                    {% else %}
+                                    --
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No requests found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

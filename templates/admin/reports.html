@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}System Reports{% endblock %}
+{% block content %}
+<div class="page-header px-4 py-4">
+    <h2 class="page-title">Company Analytics & Reports</h2>
+</div>
+<div class="px-4">
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5>Attendance Summary</h5>
+                    <p class="text-muted">Generate daily, weekly, or monthly attendance charts.</p>
+                    <a href="{% url 'report_preview' 'attendance' %}" class="btn btn-primary btn-sm">Generate PDF</a>
+                    <a href="{% url 'report_preview' 'attendance' %}" class="btn btn-outline-primary btn-sm ms-2">Export
+                        Excel</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5>Project Performance</h5>
+                    <p class="text-muted">Analyze completion rates and resource allocation.</p>
+                    <a href="{% url 'report_preview' 'projects' %}" class="btn btn-primary btn-sm">Generate PDF</a>
+                    <a href="{% url 'report_preview' 'projects' %}" class="btn btn-outline-primary btn-sm ms-2">Export
+                        Excel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}Manage Personnel{% endblock %}
+{% block page_title %}Human Capital Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Company Staff Directory</h4>
+        <p class="text-secondary small mb-0">Overview of all active personnel and system access roles.</p>
+    </div>
+    <a href="{% url 'add_user' %}" class="btn btn-primary d-flex align-items-center gap-2">
+        <i data-feather="user-plus" class="icon-sm"></i> Add New Employee
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light bg-opacity-50">
+                <tr>
+                    <th class="ps-4 py-3 border-0 text-secondary small text-uppercase">Member</th>
+                    <th class="py-3 border-0 text-secondary small text-uppercase">Role / Auth</th>
+                    <th class="py-3 border-0 text-secondary small text-uppercase">Department</th>
+                    <th class="py-3 border-0 text-secondary small text-uppercase">Joined</th>
+                    <th class="pe-4 py-3 border-0 text-secondary small text-uppercase text-end">Operations</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td class="ps-4 py-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="{% if u.profile_pic %}{{ u.profile_pic.url }}{% else %}https://ui-avatars.com/api/?name={{ u.username }}&background=6366f1&color=fff{% endif %}"
+                                class="rounded-circle shadow-sm"
+                                style="width: 44px; height: 44px; object-fit: cover; border: 2px solid #fff;">
+                            <div>
+                                <div class="fw-bold text-dark">{{ u.get_full_name|default:u.username }}</div>
+                                <div class="text-muted small">{{ u.email }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3">
+                        {% if u.is_admin %}
+                        <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill fw-bold">ADMIN /
+                            ROOT</span>
+                        {% elif u.is_hr %}
+                        <span class="badge bg-indigo bg-opacity-10 text-indigo px-3 py-2 rounded-pill fw-bold"
+                            style="color: #6366f1; background: rgba(99, 102, 241, 0.1);">HR MANAGER</span>
+                        {% else %}
+                        <span class="badge bg-teal bg-opacity-10 text-teal px-3 py-2 rounded-pill fw-bold"
+                            style="color: #0d9488; background: rgba(13, 148, 136, 0.1);">EMPLOYEE</span>
+                        {% endif %}
+                    </td>
+                    <td class="py-3">
+                        <span class="text-dark fw-medium">{{ u.department|default:"Unassigned" }}</span>
+                    </td>
+                    <td class="py-3">
+                        <div class="text-dark small">{{ u.date_joined|date:"M d, Y" }}</div>
+                    </td>
+                    <td class="pe-4 py-3 text-end">
+                        <div class="btn-group shadow-sm rounded-3 overflow-hidden">
+                            <a href="{% url 'edit_user' u.id %}" class="btn btn-white btn-sm px-3" title="Edit Record">
+                                <i data-feather="edit-3" class="text-primary" style="width: 16px; height: 16px;"></i>
+                            </a>
+                            <a href="{% url 'delete_user' u.id %}" class="btn btn-white btn-sm px-3 border-start"
+                                title="Revoke Access"
+                                onclick="return confirm('Are you sure you want to delete this user?')">
+                                <i data-feather="trash-2" class="text-danger" style="width: 16px; height: 16px;"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-5">
+                        <div class="text-muted">
+                            <i data-feather="users" class="mb-3" style="width: 48px; height: 48px; opacity: 0.2;"></i>
+                            <p>No employee records found in the directory.</p>
+                            <a href="{% url 'add_user' %}" class="btn btn-sm btn-primary mt-2">Add First Member</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

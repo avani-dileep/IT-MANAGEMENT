@@ -1,0 +1,472 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ITzen | {% block title %}Advanced Management{% endblock %}</title>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@300;500;700&family=Syncopate:wght@700&display=swap"
+        rel="stylesheet">
+
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #64748b;
+            --accent: #f43f5e;
+            --bg-body: #f8fafc;
+            --bg-sidebar: #0f172a;
+            --text-main: #1e293b;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --sidebar-width: 280px;
+            --header-height: 70px;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--bg-sidebar);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: var(--transition);
+            color: #94a3b8;
+        }
+
+        .sidebar-header {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .sidebar-logo {
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 800;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: var(--transition);
+        }
+
+        .sidebar-logo:hover {
+            transform: scale(1.02);
+            color: #fff;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1;
+        }
+
+        .logo-main {
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-sub {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-top: 4px;
+            opacity: 0.8;
+        }
+
+        .logo-circle {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);
+            overflow: hidden;
+        }
+
+        .logo-circle::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: 0.5s;
+        }
+
+        .sidebar-logo:hover .logo-circle::after {
+            transform: translateX(100%);
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 1.5rem 1rem;
+            margin: 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: var(--transition);
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .nav-link.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .nav-link i {
+            width: 20px;
+            height: 20px;
+        }
+
+        .nav-caption {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            color: #475569;
+            padding: 1.5rem 1rem 0.5rem;
+        }
+
+        /* --- Main Content --- */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        .header {
+            height: var(--header-height);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .content-area {
+            padding: 2.5rem;
+        }
+
+        /* --- Components --- */
+        .card {
+            background: #fff;
+            border: none;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+        }
+
+        .badge-soft-primary {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .user-dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-wrapper {
+                margin-left: 0;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'dashboard' %}" class="sidebar-logo">
+                <div class="logo-circle">
+                    <i data-feather="zap" style="width: 22px; height: 22px; fill: #fff;"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-main">ITzen</span>
+                    <span class="logo-sub">Operations</span>
+                </div>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="{% url 'dashboard' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                        <i data-feather="grid"></i> Dashboard
+                    </a>
+                </li>
+
+                {% if user.is_admin %}
+                <li class="nav-caption">Administration</li>
+                <li class="nav-item">
+                    <a href="{% url 'manage_users' %}" class="nav-link">
+                        <i data-feather="users"></i> Manage Users
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_roles' %}" class="nav-link">
+                        <i data-feather="shield"></i> Roles & Permissions
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_monitor' %}" class="nav-link">
+                        <i data-feather="activity"></i> Activity Monitor
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_reports' %}" class="nav-link">
+                        <i data-feather="bar-chart-2"></i> Reports
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if user.is_hr %}
+                <li class="nav-caption">HR Management</li>
+                <li class="nav-item">
+                    <a href="{% url 'hr_monitor' %}" class="nav-link">
+                        <i data-feather="eye"></i> Monitor Teams
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'hr_track_projects' %}" class="nav-link">
+                        <i data-feather="briefcase"></i> Project Tracking
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'hr_recruitment' %}" class="nav-link">
+                        <i data-feather="user-plus"></i> Recruitment
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'hr_leave_management' %}" class="nav-link">
+                        <i data-feather="calendar"></i> Leave Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'hr_shifts' %}" class="nav-link">
+                        <i data-feather="clock"></i> Shift Schedule
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if user.is_employee %}
+                <li class="nav-caption">My Workspace</li>
+                <li class="nav-item">
+                    <a href="{% url 'employee_tasks' %}" class="nav-link">
+                        <i data-feather="check-square"></i> My Tasks
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'attendance' %}" class="nav-link">
+                        <i data-feather="calendar"></i> My Attendance
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'leave_application' %}" class="nav-link">
+                        <i data-feather="send"></i> Apply Leave
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'employee_performance' %}" class="nav-link">
+                        <i data-feather="trending-up"></i> Performance
+                    </a>
+                </li>
+                {% endif %}
+
+                <li class="nav-caption">Account</li>
+                <li class="nav-item">
+                    <a href="{% url 'employee_profile' %}" class="nav-link">
+                        <i data-feather="user"></i> My Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'logout' %}" class="nav-link text-danger">
+                        <i data-feather="log-out"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content wrapper -->
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="d-flex align-items-center">
+                <button class="btn d-lg-none" id="mobile-toggle">
+                    <i data-feather="menu"></i>
+                </button>
+                <h4 class="mb-0 fw-bold">{% block page_title %}Overview{% endblock %}</h4>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <div class="dropdown">
+                    <a href="#" class="user-dropdown-toggle dropdown-toggle" data-bs-toggle="dropdown">
+                        <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}https://ui-avatars.com/api/?name={{ user.username }}&background=6366f1&color=fff{% endif %}"
+                            alt="user" class="avatar-img">
+                        <div class="d-none d-md-block">
+                            <div class="small">{{ user.get_full_name|default:user.username }}</div>
+                            <span class="badge badge-soft-primary px-2 py-1" style="font-size: 10px;">{{ user.role
+                                }}</span>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-3 p-2">
+                        <li><a class="dropdown-item rounded-3" href="{% url 'employee_profile' %}"><i
+                                    class="me-2 icon-sm" data-feather="user"></i> Profile</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item rounded-3 text-danger" href="{% url 'logout' %}"><i
+                                    class="me-2 icon-sm" data-feather="log-out"></i> Sign Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 shadow-sm mb-4"
+                role="alert">
+                <div class="d-flex align-items-center gap-2">
+                    <i data-feather="info" class="icon-sm"></i>
+                    {{ message }}
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Init Feather Icons
+        feather.replace();
+
+        // Mobile Toggle
+        const sidebar = document.getElementById('sidebar');
+        const mobileToggle = document.getElementById('mobile-toggle');
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('show');
+            });
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

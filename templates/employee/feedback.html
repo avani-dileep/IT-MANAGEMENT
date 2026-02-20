@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Submit Feedback{% endblock %}
+{% block content %}
+<div class="page-header px-4 py-4">
+    <h2 class="page-title">Employee Feedback</h2>
+</div>
+<div class="px-4">
+    <div class="card border-0 shadow-sm col-md-8 mx-auto">
+        <div class="card-body">
+            <h5 class="mb-4">We value your input</h5>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Subject</label>
+                    <input type="text" name="subject" class="form-control"
+                        placeholder="e.g., Office Environment, Task Allocation" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Your Message</label>
+                    <textarea name="comment" class="form-control" rows="5"
+                        placeholder="Share your thoughts, suggestions, or concerns..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2">Submit Feedback</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

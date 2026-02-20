@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}Account Settings{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm overflow-hidden">
+    <!-- Profile Background/Header -->
+    <div class="position-relative"
+        style="height: 160px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);">
+        <div class="position-absolute translate-middle-y start-0 ms-4" style="top: 100%;">
+            <div class="position-relative">
+                <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}https://ui-avatars.com/api/?name={{ user.username }}&background=6366f1&color=fff{% endif %}"
+                    class="rounded-circle shadow-lg border border-4 border-white"
+                    style="width: 140px; height: 140px; object-fit: cover;">
+                <div class="position-absolute bottom-0 end-0 bg-success p-2 rounded-circle border border-3 border-white shadow-sm"
+                    title="Online Status"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body p-4 pt-5 mt-5">
+        <div class="row pt-2">
+            <div class="col-lg-8">
+                <h3 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h3>
+                <div class="d-flex align-items-center gap-3 text-secondary mb-4">
+                    <span class="badge badge-soft-primary px-3 py-2 rounded-pill fw-bold">{{
+                        user.get_role_display|default:user.role }}</span>
+                    <span class="d-flex align-items-center gap-1 small"><i data-feather="map-pin" class="icon-sm"></i>
+                        {{ user.department|default:"Global" }} Team</span>
+                </div>
+
+                <hr class="my-4 opacity-50">
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <h6 class="fw-bold text-dark mb-3"><i data-feather="user" class="icon-sm me-2"></i>Personal Details
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">First Name</label>
+                            <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">Last Name</label>
+                            <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-muted">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i data-feather="mail"
+                                        class="icon-sm text-secondary"></i></span>
+                                <input type="email" name="email" class="form-control border-start-0"
+                                    value="{{ user.email }}">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-muted">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i data-feather="phone"
+                                        class="icon-sm text-secondary"></i></span>
+                                <input type="text" name="phone" class="form-control border-start-0"
+                                    value="{{ user.phone|default:'' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-muted">Update Avatar</label>
+                            <input type="file" name="profile_pic" class="form-control">
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-2">
+                        <button type="submit" class="btn btn-primary px-5 fw-bold">Update Profile</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-lg-4 mt-4 mt-lg-0">
+                <div class="ps-lg-4">
+                    <div class="p-4 rounded-4 bg-light bg-opacity-50 border">
+                        <h6 class="fw-bold mb-4 text-dark">Employment Data</h6>
+
+                        <div class="mb-4">
+                            <label class="small text-muted fw-bold d-block text-uppercase letter-spacing-1">Employee
+                                ID</label>
+                            <span class="text-dark fw-medium fs-5">#EMP-{{ user.id|stringformat:"04d" }}</span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="small text-muted fw-bold d-block text-uppercase letter-spacing-1">Joined
+                                Date</label>
+                            <div class="d-flex align-items-center gap-2 text-dark">
+                                <i data-feather="calendar" class="icon-sm text-primary"></i>
+                                <span class="fw-medium">{{ user.date_joined|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="small text-muted fw-bold d-block text-uppercase letter-spacing-1">Account
+                                Status</label>
+                            <span
+                                class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill fw-bold">Active</span>
+                        </div>
+
+                        <div class="p-3 bg-white rounded-3 shadow-sm border small text-secondary">
+                            <div class="d-flex gap-2">
+                                <i data-feather="shield" class="text-warning" style="width: 16px; height: 16px;"></i>
+                                <span>Security: Your role and specific permissions are managed by the HR
+                                    administrator.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="mt-4 p-4 rounded-4 bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10">
+                        <h6 class="fw-bold mb-2">Need Help?</h6>
+                        <p class="small mb-3">Having issues updating your details or need system access?</p>
+                        <a href="{% url 'employee_feedback' %}"
+                            class="btn btn-sm btn-primary w-100 rounded-pill">Contact
+                            Support</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
