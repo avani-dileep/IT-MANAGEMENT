@@ -32,8 +32,8 @@
                     </td>
                     <td class="py-4">
                         <div class="d-flex align-items-center gap-2">
-                            <span class="p-1 px-2 rounded bg-light border small fw-bold text-primary">{{
-                                t.project.name|slice:":2"|upper }}</span>
+
+
                             <span class="text-secondary small fw-medium">{{ t.project.name }}</span>
                         </div>
                     </td>
@@ -63,74 +63,10 @@
                         </div>
                     </td>
                     <td class="pe-4 py-4 text-end">
-                        <button class="btn btn-sm btn-dark rounded-pill px-3 fw-bold" data-bs-toggle="modal"
+                        <button class="btn btn-sm btn-dark rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal"
                             data-bs-target="#updateTask{{ t.id }}">
                             <i data-feather="refresh-cw" class="icon-sm me-1"></i> Update
                         </button>
-
-                        <!-- Premium Modal -->
-                        <div class="modal fade" id="updateTask{{ t.id }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                                    <div class="modal-header border-0 p-4 pb-0">
-                                        <h5 class="modal-title fw-bold">Update Execution Matrix</h5>
-                                        <button type="button" class="btn-close shadow-none"
-                                            data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <form action="{% url 'update_task_progress' t.id %}" method="POST">
-                                        {% csrf_token %}
-                                        <div class="modal-body p-4">
-                                            <div class="mb-4 bg-light p-3 rounded-4">
-                                                <div
-                                                    class="small text-muted mb-1 text-uppercase fw-bold letter-spacing-1">
-                                                    Current Task</div>
-                                                <div class="fw-bold text-dark">{{ t.title }}</div>
-                                            </div>
-
-                                            <div class="mb-4">
-                                                <label class="form-label small fw-bold text-dark">Completion Velocity
-                                                    (%)</label>
-                                                <div class="d-flex align-items-center gap-3">
-                                                    <input type="range" name="progress" class="form-range flex-grow-1"
-                                                        min="0" max="100" value="{{ t.progress }}"
-                                                        oninput="this.nextElementSibling.innerText = this.value + '%'">
-                                                    <span class="fw-bold text-primary" style="min-width: 45px;">{{
-                                                        t.progress }}%</span>
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-1">
-                                                <label class="form-label small fw-bold text-dark">Deployment
-                                                    Status</label>
-                                                <select name="status"
-                                                    class="form-select border-0 bg-light rounded-3 p-3 shadow-none">
-                                                    <option value="TODO" {% if t.status=='TODO' %}selected{% endif %}>To
-                                                        Do / Backlog</option>
-                                                    <option value="IN_PROGRESS" {% if t.status=='IN_PROGRESS'
-                                                        %}selected{% endif %}>In Active Progress</option>
-                                                    <option value="DONE" {% if t.status=='DONE' %}selected{% endif %}>
-                                                        Completed & Archived</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer border-0 p-4 pt-0">
-                                            <button type="submit"
-                                                class="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-lg">Save
-                                                Progression</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="text-center py-5">
-                        <div class="py-4 opacity-50">
-                            <i data-feather="layers" class="mb-3" style="width: 48px; height: 48px;"></i>
-                            <p class="mb-0">Your task queue is currently empty.</p>
-                        </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -138,4 +74,63 @@
         </table>
     </div>
 </div>
+
+{% for t in tasks %}
+<div class="modal fade" id="updateTask{{ t.id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{% url 'update_task_progress' t.id %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Current Velocity (%)</label>
+                        <input type="number" name="progress" class="form-control" min="0" max="100"
+                            value="{{ t.progress }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Status Update</label>
+                        <select name="status" class="form-select">
+                            {% if t.status == 'TODO' %}
+                            <option value="TODO" selected>To Do</option>
+                            {% else %}
+                            <option value="TODO">To Do</option>
+                            {% endif %}
+
+                            {% if t.status == 'IN_PROGRESS' %}
+                            <option value="IN_PROGRESS" selected>In Progress</option>
+                            {% else %}
+                            <option value="IN_PROGRESS">In Progress</option>
+                            {% endif %}
+
+                            {% if t.status == 'DONE' %}
+                            <option value="DONE" selected>Done</option>
+                            {% else %}
+                            <option value="DONE">Done</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Upload Task Report (PDF/Docs)</label>
+                        <input type="file" name="report" class="form-control">
+                        {% if t.report %}
+                        <div class="mt-2">
+                            <a href="{{ t.report.url }}" target="_blank" class="extra-small text-primary">
+                                <i data-feather="file" class="icon-sm"></i> View Current Report
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
 {% endblock %}

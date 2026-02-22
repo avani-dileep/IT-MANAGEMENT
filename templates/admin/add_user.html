@@ -3,53 +3,261 @@
 {% block title %}Add Personnel{% endblock %}
 {% block page_title %}Recruit New Staff{% endblock %}
 
+{% block extra_css %}
+<style>
+    .content-area {
+        padding: 1.25rem !important;
+    }
+
+    .card-premium {
+        background: #fff;
+        border-radius: 30px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+    }
+
+    .form-group-custom {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 0.6rem 1rem;
+        border: 2px solid #f1f5f9;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group-custom:hover {
+        border-color: #e2e8f0;
+        transform: translateY(-2px);
+    }
+
+    .form-group-custom:focus-within {
+        border-color: var(--primary);
+        box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.2);
+    }
+
+    .form-label {
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #94a3b8;
+        margin-bottom: 0 !important;
+        display: block;
+    }
+
+    .form-group-custom input,
+    .form-group-custom select {
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        padding: 0.1rem 0 !important;
+        width: 100% !important;
+        font-weight: 700 !important;
+        color: #1e293b !important;
+        font-size: 1rem !important;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .form-group-custom input[type="file"] {
+        font-size: 0.85rem !important;
+        color: #64748b !important;
+    }
+
+    .form-group-custom input:focus {
+        color: var(--primary) !important;
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        color: #fff;
+        border: none;
+        padding: 0.85rem 3rem;
+        border-radius: 16px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-gradient:hover {
+        transform: translateY(-3px) scale(1.03);
+        box-shadow: 0 20px 40px rgba(79, 70, 229, 0.4);
+        color: #fff;
+    }
+
+    .header {
+        height: 60px !important;
+    }
+
+    .asteriskField {
+        display: none;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-10">
-        <div class="card border-0 shadow-sm overflow-hidden">
-            <div class="card-header bg-primary py-3 px-4">
-                <div class="d-flex align-items-center gap-2 text-white">
-                    <i data-feather="user-plus" style="width: 20px; height: 20px;"></i>
-                    <h5 class="mb-0 fw-bold">Employee Registration Form</h5>
+    <div class="col-lg-8">
+        <div class="card card-premium overflow-hidden">
+            <div class="card-body p-4 pt-4">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="p-2 bg-success bg-opacity-10 rounded-3">
+                        <i data-feather="user-plus" class="text-success" style="width: 22px; height: 22px;"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0 text-dark">Staff Induction</h5>
+                        <p class="small text-muted mb-0">Initialize unique system credentials for onboarding.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="card-body p-4">
+
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
+
                     <div class="row g-3">
-                        <div class="col-md-6">{{ form.username|as_crispy_field }}</div>
-                        <div class="col-md-6">{{ form.email|as_crispy_field }}</div>
-                        <div class="col-md-6">{{ form.password|as_crispy_field }}</div>
-                        <div class="col-md-6">{{ form.role|as_crispy_field }}</div>
-                        <div class="col-md-6">{{ form.first_name|as_crispy_field }}</div>
-                        <div class="col-md-6">{{ form.last_name|as_crispy_field }}</div>
-                        <div class="col-md-6">{{ form.department|as_crispy_field }}</div>
-                        <div class="col-md-6">{{ form.phone|as_crispy_field }}</div>
-                        <div class="col-12">{{ form.profile_pic|as_crispy_field }}</div>
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label class="form-label">First Name</label>
+                                {{ form.first_name }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label class="form-label">Last Name</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label class="form-label">Security Username</label>
+                                {{ form.username }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label class="form-label">Initial Password</label>
+                                {{ form.password }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label class="form-label">Email Node</label>
+                                {{ form.email }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label class="form-label">Contact Line</label>
+                                {{ form.phone }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label class="form-label">Department</label>
+                                {{ form.department }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label class="form-label">System Role</label>
+                                {{ form.role }}
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="level_field_container">
+                            <div class="form-group-custom">
+                                <label class="form-label">Employee Level</label>
+                                {{ form.level }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label class="form-label">Date of Joining</label>
+                                {{ form.date_of_joining }}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group-custom">
+                                <label class="form-label">Specific Designation</label>
+                                <select name="designation" id="id_designation" class="form-select">
+                                    <option value="">Select Department First</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group-custom">
+                                <label class="form-label">Profile Image Asset</label>
+                                <input type="file" name="profile_pic" class="form-control" id="id_profile_pic">
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="mt-4 pt-3 border-top d-flex gap-2">
-                        <button type="submit" class="btn btn-primary px-4 d-flex align-items-center gap-2">
-                            <i data-feather="save" class="icon-sm"></i> Register Member
-                        </button>
-                        <a href="{% url 'manage_users' %}" class="btn btn-outline-secondary px-4">
-                            Cancel
+                    <script>
+                        const designations = {
+                            'DEVELOPMENT': ['Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'Python Developer', 'Android Developer', 'iOS Developer', 'System Architect'],
+                            'DESIGN': ['UI Designer', 'UX Researcher', 'Visual Designer', 'Product Designer', 'Interaction Designer'],
+                            'QA': ['Manual Tester', 'Automation Engineer', 'Security Tester', 'Performance Tester', 'QA Lead'],
+                            'HR': ['HR Generalist', 'Talent Acquisition', 'Employee Relations', 'Payroll Specialist', 'HR Manager'],
+                            'MARKETING': ['SEO Specialist', 'Content Strategist', 'Social Media Manager', 'PPC Expert', 'Brand Manager'],
+                            'SALES': ['Business Development', 'Account Manager', 'Sales Executive', 'Client Relationship', 'Market Researcher'],
+                            'SUPPORT': ['System Administrator', 'Network Engineer', 'Security Analyst', 'Technical Support', 'Help Desk']
+                        };
+
+                        const deptSelect = document.querySelector('select[name="department"]');
+                        const roleSelect = document.querySelector('select[name="role"]');
+                        const designSelect = document.getElementById('id_designation');
+                        const levelContainer = document.getElementById('level_field_container');
+
+                        function updateUI() {
+                            const dept = deptSelect.value;
+                            const role = roleSelect.value;
+                            const deptText = deptSelect.options[deptSelect.selectedIndex].text;
+
+                            // Level display logic: HR and Admin don't have level
+                            if (role === 'HR' || role === 'ADMIN') {
+                                levelContainer.style.display = 'none';
+                            } else {
+                                levelContainer.style.display = 'block';
+                            }
+
+                            // Designation logic
+                            designSelect.innerHTML = '<option value="">Select Designation</option>';
+
+                            if (role === 'HR' && dept) {
+                                // Specific HR Designation
+                                const hrDesignation = `${deptText} HR`;
+                                const option = document.createElement('option');
+                                option.value = hrDesignation;
+                                option.textContent = hrDesignation;
+                                option.selected = true;
+                                designSelect.appendChild(option);
+                            } else if (designations[dept]) {
+                                // Regular Dept Designations
+                                designations[dept].forEach(d => {
+                                    const option = document.createElement('option');
+                                    option.value = d;
+                                    option.textContent = d;
+                                    designSelect.appendChild(option);
+                                });
+                            }
+                        }
+
+                        deptSelect.addEventListener('change', updateUI);
+                        roleSelect.addEventListener('change', updateUI);
+
+                        // Initial check
+                        document.addEventListener('DOMContentLoaded', updateUI);
+                    </script>
+
+                    <div class="mt-4 pt-3 border-top d-flex align-items-center justify-content-between">
+                        <a href="{% url 'manage_users' %}"
+                            class="btn text-secondary fw-bold small p-0 text-decoration-none">
+                            <i data-feather="slash" class="icon-sm me-1"></i> Abort Induction
                         </a>
+                        <button type="submit" class="btn btn-gradient d-flex align-items-center gap-2">
+                            <i data-feather="plus-circle" class="icon-sm"></i> Register Member
+                        </button>
                     </div>
                 </form>
-            </div>
-        </div>
-
-        <div class="mt-4 alert alert-soft-primary border-0 rounded-4 p-4">
-            <div class="d-flex gap-3">
-                <div class="p-2 bg-primary bg-opacity-10 rounded-3 text-primary h-100">
-                    <i data-feather="info"></i>
-                </div>
-                <div>
-                    <h6 class="fw-bold mb-1">System Note</h6>
-                    <p class="small text-secondary mb-0">Newly registered users will receive an system notification.
-                        Ensure the role assigned matches their department requirements.</p>
-                </div>
             </div>
         </div>
     </div>

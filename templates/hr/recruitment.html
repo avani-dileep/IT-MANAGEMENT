@@ -1,13 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}Talent Pipeline{% endblock %}
-{% block page_title %}Recruitment & Hiring{% endblock %}
+{% block page_title %}Recruitment &amp; Hiring{% endblock %}
 
 {% block content %}
+
+{% if messages %}
+{% for msg in messages %}
+<div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
+    {{ msg }} <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h4 class="fw-bold mb-1">Active Job Requisitions</h4>
-        <p class="text-secondary small mb-0">Track hiring status and manage candidate portals across all departments.
-        </p>
+        <h4 class="fw-bold mb-1">Job Requisitions</h4>
+        <p class="text-secondary small mb-0">Manage job postings, view applicants, and control the hiring pipeline.</p>
     </div>
     <button class="btn btn-primary d-flex align-items-center gap-2 px-4 shadow-sm" data-bs-toggle="modal"
         data-bs-target="#postJobModal">
@@ -15,151 +24,486 @@
     </button>
 </div>
 
-<!-- Premium Post Job Modal -->
+<!-- POST JOB MODAL -->
 <div class="modal fade" id="postJobModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:24px;">
             <div class="modal-header border-0 p-4 pb-0">
-                <h5 class="modal-title fw-bold">Post New Opportunity</h5>
-                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title fw-bold">Post New Opening</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST">
+            <form method="POST" action="{% url 'hr_recruitment' %}">
                 {% csrf_token %}
                 <div class="modal-body p-4">
                     {% load crispy_forms_tags %}
-                    <div class="bg-light p-4 rounded-4 mb-3 border border-dashed border-primary border-opacity-25">
-                        {{ form|crispy }}
-                    </div>
+                    <div class="bg-light p-4 rounded-4 border">{{ form|crispy }}</div>
                 </div>
                 <div class="modal-footer border-0 p-4 pt-0">
                     <button type="button" class="btn btn-outline-secondary px-4 me-2"
                         data-bs-dismiss="modal">Discard</button>
-                    <button type="submit" class="btn btn-dark px-5 fw-bold shadow-lg">Publish Opening</button>
+                    <button type="submit" class="btn btn-dark px-5 fw-bold">Publish Opening</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+<!-- JOB CARDS -->
 <div class="row g-4">
     {% for job in jobs %}
     <div class="col-md-6 col-lg-4">
-        <div class="card h-100 border-0 shadow-sm overflow-hidden card-hover">
+        <div class="card h-100 border-0 shadow-sm card-hover" style="border-radius:18px;overflow:hidden;">
+            <div
+                style="height:5px;background:{% if job.is_active %}linear-gradient(90deg,#6366f1,#4ade80){% else %}linear-gradient(90deg,#e2e8f0,#cbd5e1){% endif %};">
+            </div>
             <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div class="bg-primary bg-opacity-10 p-2 rounded-3 text-primary mb-3">
-                        <i data-feather="briefcase" style="width: 20px; height: 20px;"></i>
-                    </div>
+                <!-- Title + status -->
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="fw-bold text-dark mb-0 me-2" style="line-height:1.3;">{{ job.title }}</h5>
                     {% if job.is_active %}
-                    <span
-                        class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-bold small">Live</span>
+                    <span class="badge flex-shrink-0"
+                        style="background:#dcfce7;color:#166534;border-radius:50px;padding:4px 12px;font-size:0.7rem;font-weight:700;">●
+                        Live</span>
                     {% else %}
-                    <span
-                        class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2 fw-bold small">Closed</span>
+                    <span class="badge flex-shrink-0"
+                        style="background:#f1f5f9;color:#64748b;border-radius:50px;padding:4px 12px;font-size:0.7rem;font-weight:700;">●
+                        Closed</span>
                     {% endif %}
                 </div>
-
-                <h5 class="fw-bold text-dark mb-2">{{ job.title }}</h5>
-                <p class="text-secondary small mb-4 line-clamp-3">{{ job.description }}</p>
-
-                <div class="d-flex align-items-center gap-3 mt-auto pt-4 border-top">
-                    <div class="small text-muted flex-grow-1">
-                        <i data-feather="calendar" class="icon-sm me-1"></i> {{ job.posted_on|date:"M d" }}
-                    </div>
-                    <button class="btn btn-sm btn-outline-dark rounded-pill px-4 fw-bold" data-bs-toggle="modal"
-                        data-bs-target="#viewApps{{ job.id }}">
-                        Monitor
-                    </button>
+                <!-- Posted date -->
+                <div class="text-muted small mb-3">
+                    <i data-feather="calendar" style="width:12px;height:12px;"></i>
+                    Posted {{ job.posted_on|date:"M d, Y" }}
                 </div>
-
-                <!-- View Apps Modal -->
-                <div class="modal fade" id="viewApps{{ job.id }}" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content border-0 shadow-lg profile-card" style="border-radius: 20px;">
-                            <div class="modal-header border-0 p-4 pb-0">
-                                <h5 class="modal-title fw-bold">Applicants: {{ job.title }}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body p-4">
-                                <div class="table-responsive">
-                                    <table class="table table-sm align-middle">
-                                        <thead>
-                                            <tr>
-                                                <th class="small text-muted text-uppercase">Applicant</th>
-                                                <th class="small text-muted text-uppercase">Status</th>
-                                                <th class="small text-muted text-uppercase text-end">Files</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for c in job.candidates.all %}
-                                            <tr>
-                                                <td>
-                                                    <div class="fw-bold small">{{ c.name }}</div>
-                                                    <div class="extra-small text-muted">{{ c.email }}</div>
-                                                </td>
-                                                <td>
-                                                    <span
-                                                        class="badge {% if c.status == 'HIRED' %}bg-success{% elif c.status == 'REJECTED' %}bg-danger{% else %}bg-primary{% endif %} bg-opacity-10 {% if c.status == 'HIRED' %}text-success{% elif c.status == 'REJECTED' %}text-danger{% else %}text-primary{% endif %} rounded-pill px-2 extra-small">
-                                                        {{ c.get_status_display }}
-                                                    </span>
-                                                </td>
-                                                <td class="text-end">
-                                                    <a href="{{ c.resume.url }}"
-                                                        class="btn btn-link btn-sm p-0 text-dark"
-                                                        title="Download Resume">
-                                                        <i data-feather="download" class="icon-sm"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            {% empty %}
-                                            <tr>
-                                                <td colspan="3" class="text-center py-4">
-                                                    <div class="opacity-50">
-                                                        <i data-feather="users" class="mb-2"></i>
-                                                        <p class="mb-0 extra-small">No applicants yet.</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="modal-footer border-0 p-4 pt-0">
-                                <button type="button" class="btn btn-dark w-100 rounded-pill py-2"
-                                    data-bs-dismiss="modal">Acknowledge</button>
-                            </div>
-                        </div>
+                <!-- Description -->
+                <div class="mb-2">
+                    <div class="small fw-bold text-uppercase text-muted mb-1"
+                        style="letter-spacing:1px;font-size:0.65rem;">Description</div>
+                    <div class="small text-secondary desc-box"
+                        style="max-height:72px;overflow:hidden;transition:max-height 0.3s ease;">{{ job.description }}
                     </div>
+                    {% if job.description|length > 120 %}
+                    <button class="btn btn-link p-0 small text-primary desc-toggle"
+                        style="font-size:0.75rem;text-decoration:none;">Show more ▾</button>
+                    {% endif %}
+                </div>
+                <!-- Requirements -->
+                {% if job.requirements %}
+                <div class="mb-3">
+                    <div class="small fw-bold text-uppercase text-muted mb-1"
+                        style="letter-spacing:1px;font-size:0.65rem;">Requirements</div>
+                    <div class="small text-secondary req-box"
+                        style="max-height:60px;overflow:hidden;transition:max-height 0.3s ease;">{{ job.requirements }}
+                    </div>
+                    {% if job.requirements|length > 100 %}
+                    <button class="btn btn-link p-0 small text-primary req-toggle"
+                        style="font-size:0.75rem;text-decoration:none;">Show more ▾</button>
+                    {% endif %}
+                </div>
+                {% endif %}
+                <!-- Stats -->
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="stat-pill" style="background:#eff6ff;color:#1d4ed8;">👥 {{ job.total_count }}</span>
+                    {% if job.interview_count %}<span class="stat-pill" style="background:#fefce8;color:#854d0e;">🕐 {{
+                        job.interview_count }}</span>{% endif %}
+                    {% if job.hired_count %}<span class="stat-pill" style="background:#f0fdf4;color:#166534;">✅ {{
+                        job.hired_count }}</span>{% endif %}
+                    {% if job.rejected_count %}<span class="stat-pill" style="background:#fef2f2;color:#991b1b;">❌ {{
+                        job.rejected_count }}</span>{% endif %}
+                </div>
+                <!-- Buttons -->
+                <div class="d-flex flex-wrap gap-2 pt-3 border-top">
+                    <button class="btn btn-sm btn-primary rounded-pill px-3 flex-grow-1" data-bs-toggle="modal"
+                        data-bs-target="#viewApps{{ job.id }}">
+                        <i data-feather="eye" style="width:13px;height:13px;"></i> Applicants ({{ job.total_count }})
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" data-bs-toggle="modal"
+                        data-bs-target="#editJob{{ job.id }}" title="Edit Job">
+                        <i data-feather="edit-2" style="width:13px;height:13px;"></i>
+                    </button>
+                    <button class="btn btn-sm rounded-pill px-3"
+                        style="{% if job.is_active %}background:#fefce8;color:#854d0e;border:1px solid #fde68a;{% else %}background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;{% endif %}"
+                        data-bs-toggle="modal" data-bs-target="#toggleJob{{ job.id }}">
+                        <i data-feather="{% if job.is_active %}lock{% else %}unlock{% endif %}"
+                            style="width:13px;height:13px;"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger rounded-pill px-3" data-bs-toggle="modal"
+                        data-bs-target="#deleteJob{{ job.id }}" title="Delete">
+                        <i data-feather="trash-2" style="width:13px;height:13px;"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- EDIT MODAL -->
+    <div class="modal fade" id="editJob{{ job.id }}" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius:22px;">
+                <div class="modal-header border-0 p-4 pb-0">
+                    <h5 class="modal-title fw-bold">✏️ Edit — {{ job.title }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="{% url 'edit_job' job.id %}">
+                    {% csrf_token %}
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-uppercase text-muted"
+                                style="letter-spacing:1px;font-size:0.7rem;">Job Title</label>
+                            <input type="text" name="title" value="{{ job.title }}" required
+                                class="form-control rounded-3" style="border:1.5px solid #e2e8f0;">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-uppercase text-muted"
+                                style="letter-spacing:1px;font-size:0.7rem;">Description</label>
+                            <textarea name="description" rows="4" required class="form-control rounded-3"
+                                style="border:1.5px solid #e2e8f0;resize:vertical;">{{ job.description }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-uppercase text-muted"
+                                style="letter-spacing:1px;font-size:0.7rem;">Requirements</label>
+                            <textarea name="requirements" rows="3" class="form-control rounded-3"
+                                style="border:1.5px solid #e2e8f0;resize:vertical;">{{ job.requirements }}</textarea>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="is_active" id="isActive{{ job.id }}"
+                                {% if job.is_active %}checked{% endif %}>
+                            <label class="form-check-label small fw-bold" for="isActive{{ job.id }}">Mark as Active /
+                                Live</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 p-4 pt-0">
+                        <button type="button" class="btn btn-outline-secondary px-4"
+                            data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary px-5 fw-bold">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLOSE/REOPEN CONFIRM MODAL -->
+    <div class="modal fade" id="toggleJob{{ job.id }}" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+            <div class="modal-content border-0 shadow-lg" style="border-radius:22px;">
+                <div class="modal-body text-center p-5">
+                    <div class="mb-3" style="font-size:2.5rem;">{% if job.is_active %}🔒{% else %}🔓{% endif %}</div>
+                    <h5 class="fw-bold mb-2">{% if job.is_active %}Close This Job?{% else %}Reopen This Job?{% endif %}
+                    </h5>
+                    <p class="text-secondary small mb-4">
+                        {% if job.is_active %}
+                        <strong>{{ job.title }}</strong> will be marked <em>Closed</em> and removed from the public
+                        careers page. Existing applications will remain.
+                        {% else %}
+                        <strong>{{ job.title }}</strong> will be reopened and visible again on the careers page.
+                        {% endif %}
+                    </p>
+                    <form method="POST" action="{% url 'toggle_job_status' job.id %}">
+                        {% csrf_token %}
+                        <div class="d-flex gap-3 justify-content-center">
+                            <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                                data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn rounded-pill px-4 fw-bold"
+                                style="{% if job.is_active %}background:#d97706;color:#fff;{% else %}background:#16a34a;color:#fff;{% endif %}">
+                                {% if job.is_active %}Yes, Close It{% else %}Yes, Reopen{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRM MODAL -->
+    <div class="modal fade" id="deleteJob{{ job.id }}" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+            <div class="modal-content border-0 shadow-lg" style="border-radius:22px;">
+                <div class="modal-body text-center p-5">
+                    <div class="mb-3" style="font-size:2.5rem;">🗑️</div>
+                    <h5 class="fw-bold mb-2 text-danger">Delete This Job?</h5>
+                    <p class="text-secondary small mb-1">You are about to permanently delete <strong>{{ job.title
+                            }}</strong>.</p>
+                    <p class="text-danger small fw-bold mb-4">⚠️ This will also delete all {{ job.total_count }}
+                        application{{ job.total_count|pluralize }} and cannot be undone.</p>
+                    <form method="POST" action="{% url 'delete_job' job.id %}">
+                        {% csrf_token %}
+                        <div class="d-flex gap-3 justify-content-center">
+                            <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                                data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Yes, Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {% empty %}
     <div class="col-12 text-center py-5">
-        <div class="py-5 bg-white rounded-5 shadow-sm border border-dashed">
-            <i data-feather="search" class="mb-3 text-muted opacity-25" style="width: 64px; height: 64px;"></i>
-            <h5 class="text-dark fw-bold">No Active Requisitions Found</h5>
-            <p class="text-secondary small">Start by creating a new job posting to attract global talent.</p>
+        <div class="py-5 bg-white rounded-5 shadow-sm border">
+            <i data-feather="briefcase" class="mb-3 text-muted" style="width:64px;height:64px;opacity:0.2;"></i>
+            <h5 class="text-dark fw-bold">No Job Openings Yet</h5>
+            <p class="text-secondary small">Create your first opening to start receiving applications.</p>
             <button class="btn btn-primary mt-2 rounded-pill px-4" data-bs-toggle="modal"
-                data-bs-target="#postJobModal">Initiate Hiring</button>
+                data-bs-target="#postJobModal">Create Opening</button>
         </div>
     </div>
     {% endfor %}
 </div>
 
+<!-- APPLICANT MONITOR MODALS -->
+{% for job in jobs %}
+<div class="modal fade" id="viewApps{{ job.id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:22px;">
+            <div class="modal-header border-0 pb-0 px-4 pt-4">
+                <div>
+                    <h5 class="modal-title fw-bold mb-1">
+                        <i data-feather="users" style="width:18px;height:18px;" class="me-2 text-primary"></i>
+                        Applicants — {{ job.title }}
+                    </h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span
+                            style="font-size:0.73rem;background:#eff6ff;color:#1d4ed8;padding:3px 10px;border-radius:50px;font-weight:600;">Total:
+                            {{ job.total_count }}</span>
+                        <span
+                            style="font-size:0.73rem;background:#fefce8;color:#854d0e;padding:3px 10px;border-radius:50px;font-weight:600;">🕐
+                            Interview: {{ job.interview_count }}</span>
+                        <span
+                            style="font-size:0.73rem;background:#f0fdf4;color:#166534;padding:3px 10px;border-radius:50px;font-weight:600;">✅
+                            Hired: {{ job.hired_count }}</span>
+                        <span
+                            style="font-size:0.73rem;background:#fef2f2;color:#991b1b;padding:3px 10px;border-radius:50px;font-weight:600;">❌
+                            Rejected: {{ job.rejected_count }}</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body px-4 pb-4 pt-3">
+                <!-- Inline toast -->
+                <div id="statusToast{{ job.id }}" class="d-none mb-3 py-2 px-3 small"
+                    style="background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;border-radius:10px;">
+                    ✅ Status updated successfully!
+                </div>
+
+                {% if job.candidates.all %}
+                <div class="row g-3">
+                    {% for c in job.candidates.all %}
+                    <div class="col-md-6" id="candidateCard{{ c.id }}">
+                        <div class="p-4 border rounded-4" style="background:#fafafa;">
+                            <!-- Avatar + info + CV -->
+                            <div class="d-flex align-items-start justify-content-between mb-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white flex-shrink-0"
+                                        style="width:46px;height:46px;background:linear-gradient(135deg,#6366f1,#8b5cf6);font-size:1.1rem;">
+                                        {{ c.name|slice:":1"|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark" style="font-size:0.95rem;">{{ c.name }}</div>
+                                        <div class="text-muted" style="font-size:0.78rem;">{{ c.email }}</div>
+                                        <div class="text-muted mt-1" style="font-size:0.72rem;">
+                                            📅 Applied: {% if c.applied_on %}{{ c.applied_on|date:"M d, Y" }}{% else
+                                            %}N/A{% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if c.resume %}
+                                <a href="{{ c.resume.url }}" download
+                                    class="btn btn-sm btn-outline-dark rounded-pill px-3 flex-shrink-0">
+                                    <i data-feather="download" style="width:12px;height:12px;"></i> CV
+                                </a>
+                                {% else %}
+                                <span class="text-muted" style="font-size:0.72rem;">No CV</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Status badge -->
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="text-muted"
+                                    style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Status:</span>
+                                <span id="statusBadge{{ c.id }}"
+                                    style="font-size:0.72rem;padding:3px 12px;border-radius:50px;font-weight:700;{% if c.status == 'HIRED' %}background:#dcfce7;color:#166534;{% elif c.status == 'REJECTED' %}background:#fee2e2;color:#991b1b;{% elif c.status == 'INTERVIEW_SCHEDULED' %}background:#fefce8;color:#854d0e;{% else %}background:#eff6ff;color:#1d4ed8;{% endif %}">
+                                    {{ c.get_status_display }}
+                                </span>
+                            </div>
+
+                            <!-- Status pills -->
+                            <div class="d-flex gap-2 flex-wrap mt-2">
+                                <button onclick="updateStatus({{ c.id }}, 'APPLIED', {{ job.id }})"
+                                    id="pill_{{ c.id }}_APPLIED"
+                                    class="status-pill {% if c.status == 'APPLIED' %}active-pill-blue{% else %}inactive-pill{% endif %}">
+                                    🔵 Applied
+                                </button>
+                                <button onclick="updateStatus({{ c.id }}, 'INTERVIEW_SCHEDULED', {{ job.id }})"
+                                    id="pill_{{ c.id }}_INTERVIEW_SCHEDULED"
+                                    class="status-pill {% if c.status == 'INTERVIEW_SCHEDULED' %}active-pill-yellow{% else %}inactive-pill{% endif %}">
+                                    🟡 Interview
+                                </button>
+                                <button onclick="updateStatus({{ c.id }}, 'HIRED', {{ job.id }})"
+                                    id="pill_{{ c.id }}_HIRED"
+                                    class="status-pill {% if c.status == 'HIRED' %}active-pill-green{% else %}inactive-pill{% endif %}">
+                                    🟢 Hire
+                                </button>
+                                <button onclick="updateStatus({{ c.id }}, 'REJECTED', {{ job.id }})"
+                                    id="pill_{{ c.id }}_REJECTED"
+                                    class="status-pill {% if c.status == 'REJECTED' %}active-pill-red{% else %}inactive-pill{% endif %}">
+                                    🔴 Reject
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <div class="bg-light rounded-5 p-5 border">
+                        <i data-feather="inbox" style="width:48px;height:48px;opacity:0.3;" class="mb-3 text-muted"></i>
+                        <h6 class="fw-bold text-dark">No Applications Yet</h6>
+                        <p class="text-muted small mb-0">Applications from the public careers page appear here
+                            automatically.</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-dark w-100 rounded-pill py-2 fw-bold"
+                    data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
 <style>
-    .line-clamp-3 {
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        line-clamp: 3;
+    .card-hover {
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
     .card-hover:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important;
+        transform: translateY(-4px);
+        box-shadow: 0 16px 32px rgba(99, 102, 241, 0.13) !important;
+    }
+
+    .stat-pill {
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 50px;
+    }
+
+    .status-pill {
+        border: none;
+        cursor: pointer;
+        border-radius: 50px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0.3rem 0.9rem;
+        transition: all 0.18s ease;
+    }
+
+    .status-pill:hover {
+        opacity: 0.85;
+        transform: translateY(-1px);
+    }
+
+    .active-pill-blue {
+        background: #1d4ed8;
+        color: #fff;
+    }
+
+    .active-pill-yellow {
+        background: #d97706;
+        color: #fff;
+    }
+
+    .active-pill-green {
+        background: #16a34a;
+        color: #fff;
+    }
+
+    .active-pill-red {
+        background: #dc2626;
+        color: #fff;
+    }
+
+    .inactive-pill {
+        background: #f1f5f9;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
+    }
+
+    .inactive-pill:hover {
+        background: #e2e8f0;
+    }
+
+    .status-pill.loading {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .desc-expanded {
+        max-height: 500px !important;
     }
 </style>
+
+<script>
+    const csrfToken = '{{ csrf_token }}';
+    const STATUS_STYLES = {
+        'APPLIED': { badge: 'background:#eff6ff;color:#1d4ed8;', cls: 'active-pill-blue' },
+        'INTERVIEW_SCHEDULED': { badge: 'background:#fefce8;color:#854d0e;', cls: 'active-pill-yellow' },
+        'HIRED': { badge: 'background:#dcfce7;color:#166534;', cls: 'active-pill-green' },
+        'REJECTED': { badge: 'background:#fee2e2;color:#991b1b;', cls: 'active-pill-red' },
+    };
+    const ALL_STATUSES = ['APPLIED', 'INTERVIEW_SCHEDULED', 'HIRED', 'REJECTED'];
+
+    function updateStatus(candidateId, newStatus, jobId) {
+        ALL_STATUSES.forEach(s => { const p = document.getElementById(`pill_${candidateId}_${s}`); if (p) p.classList.add('loading'); });
+        fetch(`/hr/recruitment/candidate/${candidateId}/status/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken, 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `status=${newStatus}`
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const badge = document.getElementById(`statusBadge${candidateId}`);
+                    if (badge) { badge.textContent = data.label; badge.style.cssText = `font-size:0.72rem;padding:3px 12px;border-radius:50px;font-weight:700;${STATUS_STYLES[newStatus].badge}`; }
+                    ALL_STATUSES.forEach(s => {
+                        const p = document.getElementById(`pill_${candidateId}_${s}`);
+                        if (!p) return;
+                        p.classList.remove('loading', 'active-pill-blue', 'active-pill-yellow', 'active-pill-green', 'active-pill-red', 'inactive-pill');
+                        p.classList.add(s === newStatus ? STATUS_STYLES[newStatus].cls : 'inactive-pill');
+                    });
+                    const toast = document.getElementById(`statusToast${jobId}`);
+                    if (toast) { toast.classList.remove('d-none'); setTimeout(() => toast.classList.add('d-none'), 3000); }
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown'));
+                    ALL_STATUSES.forEach(s => { const p = document.getElementById(`pill_${candidateId}_${s}`); if (p) p.classList.remove('loading'); });
+                }
+            })
+            .catch(() => {
+                alert('Network error.');
+                ALL_STATUSES.forEach(s => { const p = document.getElementById(`pill_${candidateId}_${s}`); if (p) p.classList.remove('loading'); });
+            });
+    }
+
+    document.querySelectorAll('.desc-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const box = btn.previousElementSibling;
+            box.classList.toggle('desc-expanded');
+            btn.textContent = box.classList.contains('desc-expanded') ? 'Show less ▴' : 'Show more ▾';
+        });
+    });
+    document.querySelectorAll('.req-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const box = btn.previousElementSibling;
+            box.classList.toggle('desc-expanded');
+            btn.textContent = box.classList.contains('desc-expanded') ? 'Show less ▴' : 'Show more ▾';
+        });
+    });
+</script>
+
 {% endblock %}

@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}Feedback Management{% endblock %}
+{% block page_title %}Employee Relations{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-white border-0 p-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-bold mb-0">Incoming Feedback</h5>
+                    <p class="small text-muted mb-0">Manage suggestions from your department.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <span class="badge bg-soft-warning text-warning fw-bold px-3 py-2 rounded-pill">
+                        {{ feedbacks.count }} Submissions
+                    </span>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light bg-opacity-50">
+                        <tr>
+                            <th class="ps-4">Employee</th>
+                            <th>Topic</th>
+                            <th>Status</th>
+                            <th>Submitted On</th>
+                            <th class="pe-4 text-end">Response</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in feedbacks %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div
+                                        class="avatar-sm bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold">
+                                        {{ f.employee.username|slice:":1"|upper }}
+                                    </div>
+                                    <div>
+                                        {% with f_name=f.employee.get_full_name|default:f.employee.username %}
+                                        <div class="fw-bold text-dark">{{ f_name }}</div>
+                                        {% endwith %}
+                                        <div class="extra-small text-muted">{{ f.employee.department }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-truncate" style="max-width: 200px;">{{ f.subject }}</div>
+                                <div class="small text-muted text-truncate" style="max-width: 200px;">{{ f.message }}
+                                </div>
+                            </td>
+                            <td>
+                                <span
+                                    class="badge {% if f.is_resolved %}bg-success{% else %}bg-warning{% endif %} rounded-pill">
+                                    {% if f.is_resolved %}Resolved{% else %}Pending{% endif %}
+                                </span>
+                            </td>
+                            <td class="small">{{ f.created_at|date:"M d, Y" }}</td>
+                            <td class="pe-4 text-end">
+                                <button type="button"
+                                    class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-none"
+                                    data-bs-toggle="modal" data-bs-target="#respondModal{{ f.id }}">
+                                    {% if f.is_resolved %}View Response{% else %}Respond{% endif %}
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">No new feedback for review.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals outside loop to prevent DOM flickering/blinking -->
+{% for f in feedbacks %}
+<div class="modal fade" id="respondModal{{ f.id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-0 p-4 pb-0">
+                <h5 class="fw-bold mb-0">Address Feedback</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="bg-light p-3 rounded-4 mb-4">
+                    <p class="small fw-bold text-primary mb-1">Employee Message:</p>
+                    <p class="small text-dark mb-0 italic">"{{ f.message }}"</p>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="feedback_id" value="{{ f.id }}">
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase opacity-75">Your Official Response</label>
+                        <textarea name="hr_response" class="form-control" rows="4"
+                            placeholder="Provide a clear and professional response to the employee..."
+                            required>{{ f.hr_response|default:'' }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 fw-bold shadow-sm">
+                        <i data-feather="check" class="me-2"></i> Save & Notify Employee
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<style>
+    .bg-soft-primary {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+
+    .bg-soft-warning {
+        background-color: rgba(255, 193, 7, 0.1);
+    }
+
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    textarea.form-control {
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #eef2f6;
+        background-color: #f8fbff;
+    }
+
+    /* Prevent flickering on hover */
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.01);
+    }
+</style>
+{% endblock %}

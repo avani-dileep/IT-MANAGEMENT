@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            padding: 40px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .welcome-text {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #0f172a;
+        }
+
+        .credential-card {
+            background-color: #f1f5f9;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .credential-item {
+            margin-bottom: 12px;
+        }
+
+        .label {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .value {
+            font-size: 16px;
+            color: #1e293b;
+            font-weight: 700;
+            font-family: monospace;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #6366f1;
+            color: white !important;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .footer {
+            padding: 24px;
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="margin:0; font-size: 28px;">Welcome Home!</h1>
+        </div>
+        <div class="content">
+            <p class="welcome-text">Hi {{ user.first_name|default:user.username }},</p>
+            <p>Congratulations! We are thrilled to welcome you to <strong>Itzen Operation Company</strong>. Your profile
+                is now active in our management portal.</p>
+
+            <div class="credential-card">
+                <div class="credential-item">
+                    <div class="label">Official Designation</div>
+                    <div class="value" style="color: #6366f1;">{{ user.designation|default:"Staff Member" }}</div>
+                </div>
+                <div class="credential-item">
+                    <div class="label">System Username</div>
+                    <div class="value">{{ user.username }}</div>
+                </div>
+                <div class="credential-item" style="margin-bottom: 0;">
+                    <div class="label">Temporary Password</div>
+                    <div class="value">{{ password }}</div>
+                </div>
+            </div>
+
+            <p>Please click the button below to access your workspace. For security reasons, you will be prompted to
+                change your password during your first session.</p>
+
+            <div style="text-align: center;">
+                <a href="{{ login_url }}" class="btn">Access Your Dashboard</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>Welcome to the Itzen family!<br>
+                <strong>Itzen Operation Company - Operations Team</strong><br>
+                <span style="font-size: 10px;">This is a secure automated message.</span>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

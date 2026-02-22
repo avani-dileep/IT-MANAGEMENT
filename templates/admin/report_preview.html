@@ -35,8 +35,8 @@
                         <tr>
                             <td>{{ r.date }}</td>
                             <td>{{ r.employee.get_full_name|default:r.employee.username }}</td>
-                            <td>{{ r.check_in|time:"H:i"|default:"--" }}</td>
-                            <td>{{ r.check_out|time:"H:i"|default:"--" }}</td>
+                            <td>{{ r.check_in|time:"h:i:s A"|default:"--" }}</td>
+                            <td>{{ r.check_out|time:"h:i:s A"|default:"--" }}</td>
                         </tr>
                         {% endfor %}
                         {% elif report_type == 'Projects' %}

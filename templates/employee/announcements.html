@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Announcements{% endblock %}
+{% block page_title %}Official Broadcasts{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-white border-0 p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">Recent Announcements</h5>
+                    <span class="badge bg-primary rounded-pill px-3 py-2">{{ announcements.count }} Updates</span>
+                </div>
+            </div>
+            <div class="card-body p-4 pt-0">
+                <div class="announcement-timeline">
+                    {% for ann in announcements %}
+                    <div class="announcement-item mb-4 pb-4 border-bottom">
+                        <div class="d-flex gap-3">
+                            <div class="ann-icon flex-shrink-0">
+                                {% if ann.category == 'MEETING' %}
+                                <div class="icon-box bg-soft-primary text-primary rounded-3 p-3">
+                                    <i data-feather="video" style="width: 24px; height: 24px;"></i>
+                                </div>
+                                {% elif ann.category == 'CELEBRATION' %}
+                                <div class="icon-box bg-soft-warning text-warning rounded-3 p-3">
+                                    <i data-feather="gift" style="width: 24px; height: 24px;"></i>
+                                </div>
+                                {% elif ann.category == 'URGENT' %}
+                                <div class="icon-box bg-soft-danger text-danger rounded-3 p-3 text-danger">
+                                    <i data-feather="alert-triangle" style="width: 24px; height: 24px;"></i>
+                                </div>
+                                {% else %}
+                                <div class="icon-box bg-soft-success text-success rounded-3 p-3">
+                                    <i data-feather="info" style="width: 24px; height: 24px;"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="ann-content flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <span
+                                            class="badge {% if ann.category == 'URGENT' %}bg-danger{% else %}bg-light text-dark{% endif %} rounded-pill mb-2">
+                                            {{ ann.get_category_display }}
+                                        </span>
+                                        <h5 class="fw-bold mb-1">{{ ann.title }}</h5>
+                                    </div>
+                                    <small class="text-muted">{{ ann.created_at|timesince }} ago</small>
+                                </div>
+                                <p class="text-secondary mb-3">{{ ann.content|linebreaksbr }}</p>
+                                <div class="d-flex align-items-center gap-2 small text-muted">
+                                    <i data-feather="user" class="icon-xs"></i>
+                                    <span>Posted by {{ ann.author.get_full_name|default:ann.author.username }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5">
+                        <div class="opacity-50">
+                            <i data-feather="bell" class="mb-3" style="width: 48px; height: 48px;"></i>
+                            <p>No announcements today.</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-soft-primary {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+
+    .bg-soft-warning {
+        background-color: rgba(255, 193, 7, 0.1);
+    }
+
+    .bg-soft-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+    }
+
+    .bg-soft-success {
+        background-color: rgba(25, 135, 84, 0.1);
+    }
+
+    .icon-xs {
+        width: 14px;
+        height: 14px;
+    }
+
+    .announcement-item:last-child {
+        border-bottom: 0 !important;
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}Project Oversight{% endblock %}
+{% block page_title %}Enterprise Resource Monitoring{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold text-dark mb-1">Employee Assignment Matrix</h4>
+        <p class="text-secondary small mb-0">Live monitoring of resource allocation and project status.</p>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm overflow-hidden">
+    <div class="card-header bg-white border-0 p-4">
+        <h5 class="mb-0 fw-bold d-flex align-items-center gap-2">
+            <i data-feather="layers" class="text-primary"></i> Project Overview
+        </h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light bg-opacity-50">
+                <tr>
+                    <th class="ps-4 py-3 border-0 text-secondary small text-uppercase">Employee</th>
+                    <th class="py-3 border-0 text-secondary small text-uppercase">Project Name</th>
+                    <th class="pe-4 py-3 border-0 text-secondary small text-uppercase text-end">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in employees %}
+                {% if emp.projects.all %}
+                {% for proj in emp.projects.all %}
+                <tr>
+                    <td class="ps-4 py-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="https://ui-avatars.com/api/?name={{ emp.username }}&background=6366f1&color=fff"
+                                class="rounded-circle shadow-sm" width="38" height="38">
+                            <div>
+                                <div class="fw-bold text-dark">{{ emp.get_full_name|default:emp.username }}</div>
+                                <div class="extra-small text-muted">{{ emp.department_label }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-4">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-1 bg-light rounded text-primary">
+                                <i data-feather="box" class="icon-sm"></i>
+                            </div>
+                            <span class="fw-bold text-dark small">{{ proj.name }}</span>
+                        </div>
+                    </td>
+                    <td class="pe-4 py-4 text-end">
+                        {% if proj.status == 'COMPLETED' %}
+                        <span
+                            class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-bold small">Completed</span>
+                        {% elif proj.status == 'ONGOING' %}
+                        <span
+                            class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-bold small">Ongoing</span>
+                        {% elif proj.status == 'PLANNED' %}
+                        <span
+                            class="badge bg-info bg-opacity-10 text-info rounded-pill px-3 py-2 fw-bold small">Planned</span>
+                        {% elif proj.status == 'ONHOLD' %}
+                        <span
+                            class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2 fw-bold small">On
+                            Hold</span>
+                        {% else %}
+                        <span
+                            class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2 fw-bold small">{{
+                            proj.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td class="ps-4 py-3" colspan="3">
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="https://ui-avatars.com/api/?name={{ emp.username }}&background=6366f1&color=fff"
+                                class="rounded-circle shadow-sm" width="38" height="38">
+                            <div>
+                                <div class="fw-bold text-dark">{{ emp.get_full_name|default:emp.username }}</div>
+                                <div class="extra-small text-muted">No projects assigned</div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center py-5">
+                        <div class="opacity-50 py-4">
+                            <i data-feather="users" class="mb-3" style="width: 48px; height: 48px;"></i>
+                            <p class="mb-0">No employees found to monitor.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -48,14 +48,12 @@
                     <i data-feather="info" class="icon-sm"></i>
                     <span class="small">
                         <strong>Assigned Shift:</strong>
-                        {% with shift=user.shifts.all.first %}
-                        {% if shift %}
-                        {{ shift.get_shift_type_display }} ({{ shift.start_time|time:"H:i" }} - {{
-                        shift.end_time|time:"H:i" }})
+                        {% if today_shift %}
+                        {{ today_shift.get_shift_type_display }}
+                        ({{ today_shift.start_time|time:"H:i" }} - {{ today_shift.end_time|time:"H:i" }})
                         {% else %}
                         Not Assigned
                         {% endif %}
-                        {% endwith %}
                     </span>
                 </div>
             </div>
@@ -91,45 +89,53 @@
                                 </span>
                             </td>
                             <td class="py-3">
-                                {% if h.check_in and h.check_out %}
+                                {% if h.check_in %}
                                 <div
-                                    class="fw-bold {% if h.work_hours < 9 %}text-danger{% else %}text-success{% endif %}">
-                                    {{ h.work_hours }} hrs
+                                    class="fw-bold {% if not h.is_compliant %}text-danger{% else %}text-success{% endif %}">
+                                    {{ h.work_hours }} / {{ h.shift_duration }} hrs
                                 </div>
-                                {% if h.work_hours < 9 %} <div class="extra-small text-danger fw-bold">Work to 9 hours
+                                {% if not h.is_compliant or h.shift_mismatch_msg %}
+                                <div class="extra-small text-danger fw-bold">
+                                    {{ h.shift_mismatch_msg|default:"Mismatch Detected" }}
+                                </div>
+                                {% else %}
+                                <div class="extra-small text-success fw-bold">
+                                    Shift Fulfilled
+                                </div>
+                                {% endif %}
+                                {% else %}
+                                <span class="text-muted">--</span>
+                                {% endif %}
+                            </td>
+                            <td class="pe-4 py-3 text-end">
+                                {% if h.check_in and h.check_out %}
+                                <span
+                                    class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-bold">Complete</span>
+                                {% elif h.check_in %}
+                                <span
+                                    class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2 fw-bold pulse-opacity">Ongoing</span>
+                                {% else %}
+                                <span
+                                    class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2 fw-bold">Not
+                                    Logged</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="opacity-50">
+                                    <i data-feather="calendar" class="mb-3" style="width: 48px; height: 48px;"></i>
+                                    <p>No attendance logs found for this period.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            {% endif %}
-            {% else %}
-            <span class="text-muted">--</span>
-            {% endif %}
-            </td>
-            <td class="pe-4 py-3 text-end">
-                {% if h.check_in and h.check_out %}
-                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-bold">Complete</span>
-                {% elif h.check_in %}
-                <span
-                    class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2 fw-bold pulse-opacity">Ongoing</span>
-                {% else %}
-                <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2 fw-bold">Not
-                    Logged</span>
-                {% endif %}
-            </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" class="text-center py-5">
-                    <div class="opacity-50">
-                        <i data-feather="calendar" class="mb-3" style="width: 48px; height: 48px;"></i>
-                        <p>No attendance logs found for this period.</p>
-                    </div>
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-            </table>
         </div>
     </div>
-</div>
 </div>
 
 <script>

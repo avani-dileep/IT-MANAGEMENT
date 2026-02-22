@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Edit Announcement{% endblock %}
+{% block page_title %}Modify Broadcast{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-primary text-white p-4">
+                <h5 class="fw-bold mb-0">Update Notice Details</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase opacity-75">Category</label>
+                        {{ form.category }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase opacity-75">Title</label>
+                        {{ form.title }}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase opacity-75">Message Content</label>
+                        {{ form.content }}
+                    </div>
+                    <div class="d-flex gap-3">
+                        <a href="{% url 'hr_announcements' %}"
+                            class="btn btn-light w-100 py-3 rounded-3 fw-bold">Cancel</a>
+                        <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 fw-bold shadow-sm">
+                            <i data-feather="save" class="me-2"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    select.form-control,
+    input.form-control,
+    textarea.form-control {
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #eef2f6;
+        background-color: #f8fbff;
+    }
+</style>
+{% endblock %}

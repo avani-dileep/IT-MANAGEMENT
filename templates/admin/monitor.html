@@ -20,7 +20,7 @@
                     <tr>
                         <td><strong>{{ log.user.username }}</strong></td>
                         <td>{{ log.action }}</td>
-                        <td>{{ log.timestamp|date:"M d, Y H:i" }}</td>
+                        <td>{{ log.timestamp|date:"M d, Y h:i:s A" }}</td>
                     </tr>
                     {% empty %}
                     <tr>

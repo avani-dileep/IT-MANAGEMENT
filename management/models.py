@@ -8,11 +8,44 @@ class CustomUser(AbstractUser):
         ('HR', 'HR Manager'),
         ('EMPLOYEE', 'Employee'),
     )
+    DEPT_CHOICES = (
+        ('DEVELOPMENT', 'Software Development'),
+        ('DESIGN', 'UI/UX Design'),
+        ('QA', 'Quality Assurance'),
+        ('HR', 'Human Resources'),
+        ('MARKETING', 'Digital Marketing'),
+        ('SALES', 'Sales & Business'),
+        ('SUPPORT', 'IT Support & Security'),
+    )
+    LEVEL_CHOICES = (
+        ('JUNIOR', 'Junior Level (Level 1)'),
+        ('INTERMEDIATE', 'Intermediate (Level 2)'),
+        ('SENIOR', 'Senior Level (Level 3)'),
+        ('LEAD', 'Lead Level (Level 4)'),
+        ('EXPERT', 'Expert Level (Level 5)'),
+    )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='EMPLOYEE')
     phone = models.CharField(max_length=15, blank=True, null=True)
     profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
-    department = models.CharField(max_length=50, blank=True, null=True)
+    department = models.CharField(max_length=50, choices=DEPT_CHOICES, blank=True, null=True)
+    designation = models.CharField(max_length=100, blank=True, null=True)
+    level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default='JUNIOR')
     date_of_joining = models.DateField(blank=True, null=True)
+
+    @property
+    def assigned_hr(self):
+        """Returns the HR Manager for the user's department, falling back to any HR if needed."""
+        # 1. Look for HR in the same specific department
+        if self.department:
+            hr = self.__class__.objects.filter(role='HR', department=self.department).first()
+            if hr: return hr
+        
+        # 2. Fallback: Look for HR in the central 'HR' department
+        hr = self.__class__.objects.filter(role='HR', department='HR').first()
+        if hr: return hr
+        
+        # 3. Final Fallback: Just get the first available HR manager
+        return self.__class__.objects.filter(role='HR').first()
 
     def is_admin(self):
         return self.role == 'ADMIN' or self.is_superuser
@@ -47,6 +80,11 @@ class Project(models.Model):
         total_progress = sum(t.progress for t in tasks)
         return round(total_progress / tasks.count(), 1)
 
+    def all_tasks_completed(self):
+        tasks = self.tasks.all()
+        if not tasks: return False
+        return not tasks.exclude(status='DONE').exists()
+
 class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='tasks')
     title = models.CharField(max_length=200)
@@ -59,18 +97,38 @@ class Task(models.Model):
         ('DONE', 'Done'),
     ), default='TODO')
     progress = models.IntegerField(default=0) # 0 to 100
+    report = models.FileField(upload_to='task_reports/', blank=True, null=True)
 
     def __str__(self):
         return self.title
 
 class Announcement(models.Model):
+    CATEGORY_CHOICES = (
+        ('MEETING', 'Meeting'),
+        ('CELEBRATION', 'Celebration'),
+        ('OFFICIAL', 'Official Notice'),
+        ('URGENT', 'Urgent Alert'),
+    )
     title = models.CharField(max_length=200)
     content = models.TextField()
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='OFFICIAL')
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.title
+        return f"[{self.category}] {self.title}"
+
+class Feedback(models.Model):
+    employee = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='feedbacks')
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    hr_response = models.TextField(blank=True, null=True)
+    responded_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='responded_feedbacks')
+    is_resolved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Feedback from {self.employee.username}: {self.subject}"
 
 class JobOpening(models.Model):
     title = models.CharField(max_length=200)
@@ -95,6 +153,7 @@ class Candidate(models.Model):
         ('REJECTED', 'Rejected'),
     ), default='APPLIED')
     interview_date = models.DateTimeField(null=True, blank=True)
+    applied_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return f"{self.name} - {self.job.title}"
@@ -128,10 +187,52 @@ class Attendance(models.Model):
     def __str__(self):
         return f"{self.employee.username} - {self.date}"
 
+    def get_shift(self):
+        """Fetches the allocated shift for this attendance record's date."""
+        return self.employee.shifts.filter(day_of_week=self.date.weekday()).first()
+
     def work_hours(self):
         if self.check_in and self.check_out:
             duration = self.check_out - self.check_in
-            return round(duration.total_seconds() / 3600, 2)
+            return float(f"{duration.total_seconds() / 3600:.2f}")
+        elif self.check_in:
+            # If still logged in, calculate from now
+            duration = timezone.now() - self.check_in
+            return float(f"{duration.total_seconds() / 3600:.2f}")
+        return 0
+
+    @property
+    def shift_duration(self):
+        shift = self.get_shift()
+        return shift.duration() if shift else 9.0
+
+    @property
+    def is_compliant(self):
+        return self.work_hours() >= self.shift_duration
+
+    @property
+    def shift_mismatch_msg(self):
+        shift = self.get_shift()
+        if not shift: return ""
+        msgs = []
+        hw = self.work_hours()
+        sd = self.shift_duration
+        if hw < sd:
+            diff = float(sd - hw)
+            msgs.append(f"Short by {diff:.2f}h")
+        if self.check_in:
+            ci_time = self.check_in.time()
+            if ci_time > shift.start_time:
+                # Simple check for late entry
+                msgs.append("Late Arrival")
+        return " | ".join(msgs)
+
+    def remaining_hours(self):
+        hours_worked = self.work_hours()
+        target = self.shift_duration
+        if hours_worked < target:
+             remaining = float(target - hours_worked)
+             return float(f"{max(0.0, remaining):.2f}")
         return 0
 
 class Shift(models.Model):
@@ -156,7 +257,7 @@ class Shift(models.Model):
         if d2 <= d1:
             d2 += timedelta(days=1)
         diff = d2 - d1
-        return round(diff.total_seconds() / 3600, 1)
+        return float(f"{diff.total_seconds() / 3600:.1f}")
 
 class Document(models.Model):
     title = models.CharField(max_length=200)
@@ -188,12 +289,3 @@ class SystemLog(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.action} at {self.timestamp}"
-
-class Feedback(models.Model):
-    employee = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='feedbacks')
-    subject = models.CharField(max_length=200, blank=True, null=True)
-    comment = models.TextField() # Changed from message to comment to match view
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Feedback from {self.employee.username}"

@@ -13,7 +13,7 @@
                     <h5 class="card-title mb-0">Apply for Leave</h5>
                 </div>
                 <div class="card-body">
-                    <form method="POST">
+                    <form method="POST" id="leaveForm">
                         {% csrf_token %}
                         {% load crispy_forms_tags %}
                         {{ form|crispy }}
@@ -24,6 +24,37 @@
                 </div>
             </div>
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const today = new Date().toISOString().split('T')[0];
+                const startDateInput = document.getElementById('id_start_date');
+                const endDateInput = document.getElementById('id_end_date');
+
+                // Enforce minimum date as today for the start date
+                if (startDateInput) {
+                    startDateInput.setAttribute('min', today);
+
+                    // Update end date constraints when start date changes
+                    startDateInput.addEventListener('change', function () {
+                        if (this.value) {
+                            endDateInput.setAttribute('min', this.value);
+                            if (endDateInput.value && endDateInput.value < this.value) {
+                                endDateInput.value = this.value;
+                            }
+                        } else {
+                            endDateInput.setAttribute('min', today);
+                        }
+                    });
+
+                    // Set initial min for end date
+                    if (startDateInput.value) {
+                        endDateInput.setAttribute('min', startDateInput.value);
+                    } else {
+                        endDateInput.setAttribute('min', today);
+                    }
+                }
+            });
+        </script>
         <div class="col-md-7">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white">
@@ -42,25 +73,39 @@
                         <tbody>
                             {% for l in leaves %}
                             <tr>
-                                <td>{{ l.leave_type }}</td>
-                                <td>{{ l.start_date }} to {{ l.end_date }}</td>
-                                <td>
+                                <td class="py-3">
+                                    <div class="fw-bold text-dark">{{ l.leave_type|title }}</div>
+                                    <div class="extra-small text-muted">ID: #LV-{{ l.id|stringformat:"04d" }}</div>
+                                </td>
+                                <td class="py-3">
+                                    {% with l_start=l.start_date|date:"M d" l_end=l.end_date|date:"M d, Y" %}
+                                    <div class="small fw-medium text-dark">{{ l_start }} — {{ l_end }}</div>
+                                    {% endwith %}
+                                </td>
+                                <td class="py-3">
                                     {% if l.status == 'PENDING' %}
-                                    <span class="badge bg-soft-warning text-warning">{{ l.status }}</span>
+                                    <span
+                                        class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2 fw-bold small">Awaiting
+                                        Review</span>
                                     {% elif l.status == 'APPROVED' %}
-                                    <span class="badge bg-soft-success text-success">{{ l.status }}</span>
+                                    <span
+                                        class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-bold small">Approved</span>
                                     {% elif l.status == 'CANCELLED' %}
-                                    <span class="badge bg-soft-secondary text-secondary">{{ l.status }}</span>
+                                    <span
+                                        class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2 fw-bold small">Withdrawn</span>
                                     {% else %}
-                                    <span class="badge bg-soft-danger text-danger">{{ l.status }}</span>
+                                    <span
+                                        class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2 fw-bold small">Declined</span>
                                     {% endif %}
                                 </td>
-                                <td>
+                                <td class="py-3 text-end">
                                     {% if l.status == 'PENDING' %}
                                     <a href="{% url 'cancel_leave' l.id %}"
-                                        class="btn btn-sm btn-outline-danger">Cancel</a>
+                                        class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold">
+                                        <i data-feather="x-circle" class="icon-sm"></i> Withdraw
+                                    </a>
                                     {% else %}
-                                    --
+                                    <span class="text-muted small">Processed {{ l.applied_on|date:"M d" }}</span>
                                     {% endif %}
                                 </td>
                             </tr>

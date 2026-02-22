@@ -16,13 +16,13 @@
                     <th class="ps-4 py-3 border-0 text-secondary small text-uppercase">Member</th>
                     <th class="py-3 border-0 text-secondary small text-uppercase">Division</th>
                     <th class="py-3 border-0 text-secondary small text-uppercase">Contact Info</th>
-                    <th class="py-3 border-0 text-secondary small text-uppercase">Status</th>
-                    <th class="pe-4 py-3 border-0 text-secondary small text-uppercase text-end">Action Matrix</th>
+
+                    <th class="pe-4 py-3 border-0 text-secondary small text-uppercase text-end">Designation</th>
                 </tr>
             </thead>
             <tbody>
                 {% for e in employees %}
-                <tr>
+                <tr data-bs-toggle="modal" data-bs-target="#empDetails{{ e.id }}" style="cursor: pointer;">
                     <td class="ps-4 py-4">
                         <div class="d-flex align-items-center gap-3">
                             <img src="{% if e.profile_pic %}{{ e.profile_pic.url }}{% else %}https://ui-avatars.com/api/?name={{ e.username }}&background=6366f1&color=fff{% endif %}"
@@ -35,45 +35,18 @@
                     </td>
                     <td class="py-4">
                         <span class="badge bg-light text-dark border px-3 py-2 fw-medium rounded-pill">
-                            {{ e.department|default:"Unassigned" }}
+                            {{ e.get_department_display|default:"Unassigned" }}
                         </span>
                     </td>
                     <td class="py-4">
                         <div class="small fw-medium text-dark">{{ e.email }}</div>
                         <div class="extra-small text-muted">{{ e.phone|default:"No active contact" }}</div>
                     </td>
-                    <td class="py-4">
-                        {% with att=e.today_attendance.0 %}
-                        {% if att %}
-                        {% if att.check_in and not att.check_out %}
-                        <span
-                            class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-bold small d-inline-flex align-items-center gap-1">
-                            <span class="p-1 bg-success rounded-circle"></span> System-Active
-                        </span>
-                        <div class="extra-small text-muted mt-1">In since {{ att.check_in|time:"H:i" }}</div>
-                        {% elif att.check_out %}
-                        <span
-                            class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2 fw-bold small">
-                            Logged-Out
-                        </span>
-                        <div class="extra-small text-muted mt-1">Left at {{ att.check_out|time:"H:i" }}</div>
-                        {% else %}
-                        <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2 fw-bold small">
-                            Sync Pending
-                        </span>
-                        {% endif %}
-                        {% else %}
-                        <span class="badge bg-light text-dark border rounded-pill px-3 py-2 fw-bold small opacity-75">
-                            Awaiting Sync
-                        </span>
-                        {% endif %}
-                        {% endwith %}
-                    </td>
+
                     <td class="pe-4 py-4 text-end">
-                        <button class="btn btn-sm btn-dark rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal"
-                            data-bs-target="#empDetails{{ e.id }}">
-                            <i data-feather="eye" class="icon-sm me-1"></i> Inspect
-                        </button>
+                        <span class="fw-bold text-primary small">
+                            {{ e.designation|default:"Staff Member" }}
+                        </span>
                     </td>
                 </tr>
                 {% empty %}
@@ -92,7 +65,7 @@
     </div>
 </div>
 
-<!-- Modals moved outside table to prevent flickering -->
+<!-- Modals outside table -->
 {% for e in employees %}
 <div class="modal fade" id="empDetails{{ e.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -106,8 +79,10 @@
                     style="object-fit: cover;">
 
                 <h4 class="fw-bold text-dark mb-1">{{ e.get_full_name|default:e.username }}</h4>
-                <p class="text-primary small fw-bold text-uppercase letter-spacing-1 mb-4">{{
-                    e.department|default:"General Operations" }}</p>
+                <p class="text-primary small fw-bold text-uppercase letter-spacing-1 mb-0">{{
+                    e.designation|default:"Official Staff" }}</p>
+                <p class="text-muted extra-small fw-bold text-uppercase letter-spacing-1 mb-4">{{
+                    e.get_department_display|default:"General Operations" }}</p>
 
                 <div class="row g-3 text-start bg-light rounded-4 p-4 border border-white shadow-sm">
                     <div class="col-6">
@@ -115,7 +90,8 @@
                         <div class="text-dark fw-bold small">@{{ e.username }}</div>
                     </div>
                     <div class="col-6">
-                        <label class="extra-small text-muted text-uppercase fw-bold mb-1 d-block">Employee Role</label>
+                        <label class="extra-small text-muted text-uppercase fw-bold mb-1 d-block">Induction
+                            Status</label>
                         <div class="text-dark fw-bold small">{{ e.get_role_display }}</div>
                     </div>
                     <div class="col-12">
@@ -133,6 +109,18 @@
                             H:i"|default:"Never" }}</div>
                     </div>
                     <div class="col-12">
+                        <label class="extra-small text-muted text-uppercase fw-bold mb-1 d-block">Active
+                            Allocations</label>
+                        <div class="d-flex flex-wrap gap-1">
+                            {% for p in e.projects.all %}
+                            <span class="badge bg-primary bg-opacity-10 text-primary small rounded-pill px-3 py-2">{{
+                                p.name }}</span>
+                            {% empty %}
+                            <span class="text-muted small">No active projects</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-12 mt-2">
                         <label class="extra-small text-muted text-uppercase fw-bold mb-1 d-block">Communication
                             Line</label>
                         <div class="text-dark fw-bold small">{{ e.email }}</div>

@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="ITzen — Next-Generation IT Company Management Platform. Software Development, Design, QA and more.">
+    <title>ITzen | Intelligent Workforce OS</title>
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@300;500;700&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg-dark: #0a0f1e;
+            --bg-card: #111827;
+            --bg-card2: #1a2236;
+            --border-subtle: rgba(99, 102, 241, 0.2);
+            --text-muted-dark: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        /* NAV */
+        .guest-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 15, 30, 0.85);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 1rem 2rem;
+        }
+
+        .brand-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -2px;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .brand-logo span {
+            font-weight: 300;
+            opacity: 0.3;
+            font-family: 'Outfit';
+        }
+
+        .brand-tag {
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .nav-link-custom {
+            color: var(--text-muted-dark);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link-custom:hover {
+            color: #fff;
+        }
+
+        .btn-login {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-login:hover {
+            background: var(--primary-dark);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        /* HERO */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            padding: 80px 1rem 60px;
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.35);
+            color: #a5b4fc;
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.3);
+            }
+        }
+
+        .hero-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.8rem, 6vw, 5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, #818cf8 0%, #6366f1 40%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            color: var(--text-muted-dark);
+            font-size: 1.1rem;
+            max-width: 560px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+        }
+
+        .btn-hero-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            border: none;
+            padding: 0.85rem 2rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-hero-primary:hover {
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-hero-secondary {
+            background: transparent;
+            color: #e2e8f0;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            padding: 0.85rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.25s;
+        }
+
+        .btn-hero-secondary:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(148, 163, 184, 0.5);
+        }
+
+        /* STATS BAR */
+        .stats-bar {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 2rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted-dark);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* SECTION COMMON */
+        .section {
+            padding: 100px 0;
+        }
+
+        .section-tag {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            color: #a5b4fc;
+            padding: 0.25rem 0.9rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: #fff;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .section-sub {
+            color: var(--text-muted-dark);
+            font-size: 1rem;
+            line-height: 1.7;
+            max-width: 540px;
+        }
+
+        /* SERVICE CARDS */
+        .service-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s;
+            height: 100%;
+        }
+
+        .service-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+
+        .service-icon {
+            width: 52px;
+            height: 52px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a5b4fc;
+            margin-bottom: 1.25rem;
+        }
+
+        .service-title {
+            font-family: 'Space Grotesk';
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .service-desc {
+            color: var(--text-muted-dark);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* JOB CARDS */
+        .careers-section {
+            background: var(--bg-card);
+        }
+
+        .job-card {
+            background: var(--bg-card2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 1.75rem;
+            transition: all 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .job-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+
+        .job-badge-open {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(34, 197, 94, 0.12);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #86efac;
+            padding: 0.2rem 0.85rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .job-badge-open .dot-green {
+            width: 6px;
+            height: 6px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse-green 2s infinite;
+        }
+
+        .job-title {
+            font-family: 'Space Grotesk';
+            font-weight: 700;
+            color: #fff;
+            font-size: 1.15rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .job-desc {
+            color: var(--text-muted-dark);
+            font-size: 0.875rem;
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .job-req {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .job-req-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #a5b4fc;
+            margin-bottom: 0.4rem;
+        }
+
+        .job-req-text {
+            font-size: 0.8rem;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .job-meta {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .job-posted {
+            font-size: 0.75rem;
+            color: #475569;
+        }
+
+        .btn-apply {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            border: none;
+            padding: 0.45rem 1.1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-apply:hover {
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+        }
+
+        .apply-email-banner {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(79, 70, 229, 0.06));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        /* WHY ITSEN */
+        .why-card {
+            border-left: 3px solid var(--primary);
+            padding: 1.25rem 1.5rem;
+            background: var(--bg-card);
+            border-radius: 0 14px 14px 0;
+            margin-bottom: 1rem;
+        }
+
+        .why-title {
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.25rem;
+        }
+
+        .why-desc {
+            color: var(--text-muted-dark);
+            font-size: 0.875rem;
+        }
+
+        /* DEPTS */
+        .dept-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 0.6rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #c7d2fe;
+            margin: 0.3rem;
+            transition: all 0.2s;
+        }
+
+        .dept-chip:hover {
+            border-color: var(--primary);
+            color: #fff;
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* FOOTER */
+        .guest-footer {
+            background: #060b17;
+            border-top: 1px solid var(--border-subtle);
+            padding: 3rem 0 1.5rem;
+        }
+
+        .footer-brand {
+            font-family: 'Space Grotesk';
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .footer-brand span {
+            opacity: 0.3;
+            font-family: 'Outfit';
+            font-weight: 300;
+        }
+
+        .footer-link {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.85rem;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+            color: #a5b4fc;
+        }
+
+        /* SCROLL reveal helper */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="guest-nav">
+        <div class="container d-flex align-items-center justify-content-between">
+            <a href="#" class="text-decoration-none">
+                <div class="brand-logo">IT<span>zen</span></div>
+                <div class="brand-tag">Operations Platform</div>
+            </a>
+            <div class="d-none d-lg-flex align-items-center gap-4">
+                <a href="#about" class="nav-link-custom">About</a>
+                <a href="#services" class="nav-link-custom">Services</a>
+                <a href="#careers" class="nav-link-custom">Careers</a>
+                <a href="#departments" class="nav-link-custom">Departments</a>
+                <a href="#contact" class="nav-link-custom">Contact</a>
+            </div>
+            <a href="{% url 'login' %}" class="btn-login">
+                Staff Login &rarr;
+            </a>
+        </div>
+    </nav>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero-section" id="home">
+        <div class="hero-glow"></div>
+        <div class="container position-relative" style="z-index:2;">
+            <div class="hero-badge">
+                <span class="dot"></span> Now Hiring Top IT Talent
+            </div>
+            <h1 class="hero-title">
+                The Intelligent<br>
+                <span class="gradient-text">Workforce OS</span><br>
+                for IT Companies
+            </h1>
+            <p class="hero-sub">
+                ITzen is a next-generation IT company management platform — connecting teams, streamlining workflows,
+                and powering transparent communication across every department.
+            </p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="#about" class="btn-hero-primary">
+                    Explore ITzen
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </a>
+                <a href="#careers" class="btn-hero-secondary">View Open Positions</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== STATS BAR ===== -->
+    <div class="stats-bar">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-number">7+</div>
+                        <div class="stat-label">Departments</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Digital Workflow</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">Role Levels</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Attendance Tracking</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ABOUT ===== -->
+    <section class="section" id="about">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-5 fade-up">
+                    <div class="section-tag">About ITzen</div>
+                    <h2 class="section-title">Built for Modern<br>IT Organizations</h2>
+                    <p class="section-sub mb-4">
+                        ITzen is a comprehensive IT Company Management System designed to unify Admin, HR, and Employee
+                        workflows under one intelligent, transparent platform.
+                    </p>
+                    <a href="{% url 'login' %}" class="btn-login py-2 px-4">Join the Platform →</a>
+                </div>
+                <div class="col-lg-7 fade-up">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="why-card">
+                                <div class="why-title">🏢 Admin Control</div>
+                                <div class="why-desc">Full organizational oversight — manage users, roles, projects and
+                                    reports.</div>
+                            </div>
+                            <div class="why-card">
+                                <div class="why-title">📋 HR Management</div>
+                                <div class="why-desc">Streamline recruitment, leaves, shifts, feedback, and
+                                    announcements.</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="why-card" style="margin-top: 1.5rem;">
+                                <div class="why-title">👤 Employee Portal</div>
+                                <div class="why-desc">Tasks, attendance, performance, and leave — all in one place.
+                                </div>
+                            </div>
+                            <div class="why-card">
+                                <div class="why-title">📢 Live Broadcasts</div>
+                                <div class="why-desc">HR posts company-wide announcements visible to all staff
+                                    instantly.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SERVICES ===== -->
+    <section class="section" id="services"
+        style="background: var(--bg-card); border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle);">
+        <div class="container">
+            <div class="text-center mb-5 fade-up">
+                <div class="section-tag">What We Do</div>
+                <h2 class="section-title">Core Capabilities</h2>
+                <p class="section-sub mx-auto">Everything your IT company needs — from project management to
+                    payroll-ready attendance tracking.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4 fade-up">
+                    <div class="service-card">
+                        <div class="service-icon"><i data-feather="users"></i></div>
+                        <div class="service-title">Workforce Management</div>
+                        <div class="service-desc">Manage all employees, designations, departments, and multi-role access
+                            across your organization.</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 fade-up">
+                    <div class="service-card">
+                        <div class="service-icon"><i data-feather="briefcase"></i></div>
+                        <div class="service-title">Project Tracking</div>
+                        <div class="service-desc">Create, assign, and track projects end-to-end with task allocation and
+                            completion analytics.</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 fade-up">
+                    <div class="service-card">
+                        <div class="service-icon"><i data-feather="clock"></i></div>
+                        <div class="service-title">Attendance & Shifts</div>
+                        <div class="service-desc">Precise clock-in/out sessions with Day & Night shift assignments and
+                            compliance tracking.</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 fade-up">
+                    <div class="service-card">
+                        <div class="service-icon"><i data-feather="calendar"></i></div>
+                        <div class="service-title">Leave Management</div>
+                        <div class="service-desc">Apply, approve, or reject leave requests with full department-level
+                            visibility for HR.</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 fade-up">
+                    <div class="service-card">
+                        <div class="service-icon"><i data-feather="bar-chart-2"></i></div>
+                        <div class="service-title">Performance Reviews</div>
+                        <div class="service-desc">Monitor employee KPIs, task completion rates, and generate printable
+                            performance reports.</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 fade-up">
+                    <div class="service-card">
+                        <div class="service-icon"><i data-feather="message-square"></i></div>
+                        <div class="service-title">Feedback & Communication</div>
+                        <div class="service-desc">Employees submit feedback; HR responds officially. Transparent two-way
+                            communication built in.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CAREERS / RECRUITMENT ===== -->
+    <section class="section careers-section" id="careers">
+        <div class="container">
+            <div class="text-center mb-5 fade-up">
+                <div class="section-tag">We're Hiring</div>
+                <h2 class="section-title">Open Positions at ITzen</h2>
+                <p class="section-sub mx-auto">Join our growing team of innovators. Explore the latest job openings and
+                    take the next step in your tech career.</p>
+            </div>
+            <div class="row g-4">
+                {% for job in job_openings %}
+                <div class="col-md-6 col-lg-4 fade-up">
+                    <div class="job-card">
+                        <div class="job-badge-open">
+                            <span class="dot-green"></span> Open Position
+                        </div>
+                        <div class="job-title">{{ job.title }}</div>
+                        <div class="job-desc">{{ job.description|truncatewords:25 }}</div>
+                        <div class="job-req">
+                            <div class="job-req-label">Requirements</div>
+                            <div class="job-req-text">{{ job.requirements|truncatewords:20 }}</div>
+                        </div>
+                        <div class="job-meta">
+                            <span class="job-posted">
+                                <i data-feather="calendar" style="width:12px;height:12px;"></i>
+                                Posted {{ job.posted_on|date:"M d, Y" }}
+                            </span>
+                            <button type="button" class="btn-apply" data-bs-toggle="modal" data-bs-target="#applyModal"
+                                data-job-id="{{ job.id }}" data-job-title="{{ job.title }}">
+                                <i data-feather="send" style="width:13px;height:13px;"></i> Apply Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center fade-up">
+                    <div
+                        style="background: var(--bg-card2); border: 1px dashed var(--border-subtle); border-radius: 20px; padding: 3rem;">
+                        <i data-feather="briefcase"
+                            style="width:48px; height:48px; color: #475569; margin-bottom:1rem;"></i>
+                        <p style="color: #64748b; margin:0; font-size:0.95rem;">No open positions right now. Send your
+                            resume to be considered for future openings.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Email Resume CTA banner -->
+            <div class="apply-email-banner fade-up">
+                <i data-feather="mail" style="width:32px;height:32px;color:#a5b4fc;margin-bottom:0.75rem;"></i>
+                <h5 style="color:#fff; font-family:'Space Grotesk'; font-weight:700; margin-bottom:0.4rem;">Don't see
+                    your role? Send us your resume!</h5>
+                <p style="color:#64748b; font-size:0.9rem; margin-bottom:1.25rem;">We're always looking for talented
+                    individuals. Drop your CV and we'll reach out when the right role opens up.</p>
+                <button type="button" class="btn-hero-primary"
+                    style="display:inline-flex; font-size:0.95rem; border:none; cursor:pointer;" data-bs-toggle="modal"
+                    data-bs-target="#applyModal" data-job-id="" data-job-title="Open Application">
+                    <i data-feather="send" style="width:16px;height:16px;"></i>
+                    Send Your Resume
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== DEPARTMENTS ===== -->
+    <section class="section" id="departments">
+        <div class="container">
+            <div class="text-center mb-5 fade-up">
+                <div class="section-tag">Our Teams</div>
+                <h2 class="section-title">Departments at ITzen</h2>
+                <p class="section-sub mx-auto">Our talent spans across specialized divisions — each playing a crucial
+                    role in delivering world-class IT solutions.</p>
+            </div>
+            <div class="text-center fade-up">
+                <span class="dept-chip"><i data-feather="code" style="width:16px;height:16px;"></i> Software
+                    Development</span>
+                <span class="dept-chip"><i data-feather="pen-tool" style="width:16px;height:16px;"></i> UI/UX
+                    Design</span>
+                <span class="dept-chip"><i data-feather="check-circle" style="width:16px;height:16px;"></i> Quality
+                    Assurance</span>
+                <span class="dept-chip"><i data-feather="users" style="width:16px;height:16px;"></i> Human
+                    Resources</span>
+                <span class="dept-chip"><i data-feather="trending-up" style="width:16px;height:16px;"></i> Digital
+                    Marketing</span>
+                <span class="dept-chip"><i data-feather="dollar-sign" style="width:16px;height:16px;"></i> Sales &
+                    Business</span>
+                <span class="dept-chip"><i data-feather="shield" style="width:16px;height:16px;"></i> IT Support &
+                    Security</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CONTACT / CTA ===== -->
+    <section class="section" id="contact"
+        style="background: linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(79,70,229,0.05) 100%); border-top: 1px solid var(--border-subtle);">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-7 fade-up">
+                    <div class="section-tag">Work With Us</div>
+                    <h2 class="section-title">Ready to Join ITzen?</h2>
+                    <p class="section-sub mx-auto mb-4">
+                        Whether you're a prospective employee or an enterprise looking to license our platform — we'd
+                        love to connect. Our team responds within 24 hours.
+                    </p>
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <a href="mailto:careers@itcompany.com" class="btn-hero-primary">
+                            <i data-feather="mail" style="width:18px; height:18px;"></i> careers@itcompany.com
+                        </a>
+                        <a href="{% url 'login' %}" class="btn-hero-secondary">Staff Portal Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== APPLICATION MODAL ===== -->
+    <div class="modal fade" id="applyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content"
+                style="background:#111827; border:1px solid rgba(99,102,241,0.3); border-radius:20px; color:#e2e8f0;">
+                <div class="modal-header" style="border-bottom:1px solid rgba(99,102,241,0.2); padding:1.5rem 1.75rem;">
+                    <div>
+                        <h5 class="modal-title"
+                            style="font-family:'Space Grotesk'; font-weight:700; font-size:1.2rem; color:#fff;">Apply
+                            for Position</h5>
+                        <p class="mb-0" id="modalJobLabel" style="color:#a5b4fc; font-size:0.85rem;"></p>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="applyForm" method="POST" action="{% url 'apply_job' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="job_id" id="modalJobIdInput">
+                    <div class="modal-body" style="padding:1.75rem;">
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label
+                                style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#94a3b8; margin-bottom:0.4rem; display:block;">Full
+                                Name *</label>
+                            <input type="text" name="name" required placeholder="e.g. Gouri Nair"
+                                style="width:100%; background:#1a2236; border:1px solid rgba(99,102,241,0.25); border-radius:10px; padding:0.65rem 1rem; color:#fff; font-size:0.9rem; outline:none; transition:border 0.2s;"
+                                onfocus="this.style.borderColor='#6366f1'"
+                                onblur="this.style.borderColor='rgba(99,102,241,0.25)'">
+                        </div>
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label
+                                style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#94a3b8; margin-bottom:0.4rem; display:block;">Email
+                                Address *</label>
+                            <input type="email" name="email" required placeholder="your@email.com"
+                                style="width:100%; background:#1a2236; border:1px solid rgba(99,102,241,0.25); border-radius:10px; padding:0.65rem 1rem; color:#fff; font-size:0.9rem; outline:none; transition:border 0.2s;"
+                                onfocus="this.style.borderColor='#6366f1'"
+                                onblur="this.style.borderColor='rgba(99,102,241,0.25)'">
+                        </div>
+                        <!-- Resume Upload -->
+                        <div class="mb-3">
+                            <label
+                                style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#94a3b8; margin-bottom:0.4rem; display:block;">Resume
+                                / CV *</label>
+                            <div id="resumeDropZone"
+                                style="border:2px dashed rgba(99,102,241,0.35); border-radius:12px; padding:1.5rem; text-align:center; cursor:pointer; transition:all 0.2s; background:#0d1525;"
+                                onclick="document.getElementById('resumeInput').click()">
+                                <i data-feather="upload-cloud"
+                                    style="width:28px;height:28px;color:#6366f1;margin-bottom:0.5rem;"></i>
+                                <div style="color:#94a3b8; font-size:0.85rem;">Click to upload <span
+                                        style="color:#a5b4fc; font-weight:600;">PDF, DOC, DOCX</span></div>
+                                <div id="resumeFileName" style="color:#6366f1; font-size:0.8rem; margin-top:0.3rem;">
+                                </div>
+                            </div>
+                            <input type="file" name="resume" id="resumeInput" accept=".pdf,.doc,.docx" required
+                                style="display:none;">
+                        </div>
+                        <!-- Note -->
+                        <p style="font-size:0.78rem; color:#475569; margin:0;">📧 Your application will be reviewed by
+                            our HR team. We respond within 3–5 business days.</p>
+                    </div>
+                    <div class="modal-footer"
+                        style="border-top:1px solid rgba(99,102,241,0.2); padding:1.25rem 1.75rem; gap:0.75rem;">
+                        <button type="button" class="btn-hero-secondary"
+                            style="padding:0.55rem 1.25rem; font-size:0.9rem;" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-apply" style="padding:0.55rem 1.5rem; font-size:0.9rem;">
+                            <i data-feather="send" style="width:15px;height:15px;"></i> Submit Application
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Success -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999;">
+        <div id="applyToast" class="toast align-items-center" role="alert"
+            style="background:#111827; border:1px solid rgba(34,197,94,0.4); border-radius:14px; color:#fff;">
+            <div class="d-flex">
+                <div class="toast-body" style="font-size:0.9rem;">
+                    ✅ <strong>Application submitted!</strong> We'll be in touch soon.
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="guest-footer">
+        <div class="container">
+            <div class="row g-4 pb-4" style="border-bottom: 1px solid #1e2d47;">
+                <div class="col-lg-4">
+                    <div class="footer-brand">IT<span>zen</span></div>
+                    <p class="mt-3" style="color: #475569; font-size: 0.875rem; line-height: 1.7;">
+                        A next-generation IT Company Management System that unifies workforce, projects, and
+                        communication in one intelligent platform.
+                    </p>
+                </div>
+                <div class="col-lg-2 col-6">
+                    <div
+                        style="font-size: 0.8rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem;">
+                        Platform</div>
+                    <a href="#about" class="footer-link">About</a>
+                    <a href="#services" class="footer-link">Services</a>
+                    <a href="#departments" class="footer-link">Departments</a>
+                    <a href="#careers" class="footer-link">Careers</a>
+                </div>
+                <div class="col-lg-2 col-6">
+                    <div
+                        style="font-size: 0.8rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem;">
+                        Access</div>
+                    <a href="{% url 'login' %}" class="footer-link">Staff Login</a>
+                    <a href="#contact" class="footer-link">Contact HR</a>
+                    <a href="#contact" class="footer-link">Careers</a>
+                </div>
+                <div class="col-lg-4">
+                    <div
+                        style="font-size: 0.8rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem;">
+                        Watch Announcements</div>
+                    <p style="color: #475569; font-size: 0.85rem;">Stay up to date with the latest news from our HR team
+                        by visiting the announcements section above.</p>
+                    <a href="#announcements" class="btn-login mt-2 d-inline-block"
+                        style="font-size:0.8rem; padding: 0.4rem 1rem;">View Latest →</a>
+                </div>
+            </div>
+            <div class="text-center pt-4" style="color: #334155; font-size: 0.8rem;">
+                © 2026 ITzen Operations Platform. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        feather.replace();
+
+        // Scroll fade-up animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+        // Active nav highlight on scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link-custom');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.getAttribute('id'); });
+            navLinks.forEach(a => { a.style.color = a.getAttribute('href') === '#' + current ? '#fff' : ''; });
+        });
+
+        // Apply modal — pre-fill job title from button data attributes
+        const applyModal = document.getElementById('applyModal');
+        applyModal.addEventListener('show.bs.modal', (event) => {
+            const btn = event.relatedTarget;
+            const jobId = btn.getAttribute('data-job-id');
+            const jobTitle = btn.getAttribute('data-job-title');
+            document.getElementById('modalJobIdInput').value = jobId;
+            document.getElementById('modalJobLabel').textContent = jobTitle ? '📌 ' + jobTitle : 'General Application';
+            feather.replace(); // re-render icons inside modal
+        });
+
+        // Resume file name display
+        document.getElementById('resumeInput').addEventListener('change', function () {
+            const fileName = this.files[0] ? this.files[0].name : '';
+            document.getElementById('resumeFileName').textContent = fileName ? '📎 ' + fileName : '';
+            document.getElementById('resumeDropZone').style.borderColor = fileName ? '#22c55e' : 'rgba(99,102,241,0.35)';
+        });
+
+        // Form submission via AJAX so modal stays open on error
+        document.getElementById('applyForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch(this.action, { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        bootstrap.Modal.getInstance(applyModal).hide();
+                        this.reset();
+                        document.getElementById('resumeFileName').textContent = '';
+                        const toast = new bootstrap.Toast(document.getElementById('applyToast'), { delay: 4000 });
+                        toast.show();
+                    } else {
+                        alert('Error: ' + (data.error || 'Please check your input and try again.'));
+                    }
+                })
+                .catch(() => alert('Something went wrong. Please try again.'));
+        });
+    </script>
+</body>
+
+</html>

@@ -314,9 +314,10 @@
                         <i data-feather="users"></i> Manage Users
                     </a>
                 </li>
+
                 <li class="nav-item">
-                    <a href="{% url 'admin_roles' %}" class="nav-link">
-                        <i data-feather="shield"></i> Roles & Permissions
+                    <a href="{% url 'admin_project_status' %}" class="nav-link">
+                        <i data-feather="monitor"></i> Project Oversight
                     </a>
                 </li>
                 <li class="nav-item">
@@ -327,6 +328,11 @@
                 <li class="nav-item">
                     <a href="{% url 'admin_reports' %}" class="nav-link">
                         <i data-feather="bar-chart-2"></i> Reports
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_feedback_view' %}" class="nav-link">
+                        <i data-feather="message-circle"></i> Feedback Log
                     </a>
                 </li>
                 {% endif %}
@@ -358,6 +364,16 @@
                         <i data-feather="clock"></i> Shift Schedule
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{% url 'hr_announcements' %}" class="nav-link">
+                        <i data-feather="bell"></i> Announcements
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'hr_manage_feedback' %}" class="nav-link">
+                        <i data-feather="message-circle"></i> Employee Feedback
+                    </a>
+                </li>
                 {% endif %}
 
                 {% if user.is_employee %}
@@ -380,6 +396,16 @@
                 <li class="nav-item">
                     <a href="{% url 'employee_performance' %}" class="nav-link">
                         <i data-feather="trending-up"></i> Performance
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'employee_announcements' %}" class="nav-link">
+                        <i data-feather="bell"></i> Announcements
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'employee_feedback' %}" class="nav-link">
+                        <i data-feather="message-square"></i> Suggestion Box
                     </a>
                 </li>
                 {% endif %}
@@ -414,20 +440,28 @@
                     <a href="#" class="user-dropdown-toggle dropdown-toggle" data-bs-toggle="dropdown">
                         <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}https://ui-avatars.com/api/?name={{ user.username }}&background=6366f1&color=fff{% endif %}"
                             alt="user" class="avatar-img">
-                        <div class="d-none d-md-block">
-                            <div class="small">{{ user.get_full_name|default:user.username }}</div>
-                            <span class="badge badge-soft-primary px-2 py-1" style="font-size: 10px;">{{ user.role
-                                }}</span>
+                        <div class="d-none d-md-block text-start">
+                            <div class="small fw-bold lh-1 mb-1">{{ user.get_full_name|default:user.username }}</div>
+                            <span class="badge bg-primary bg-opacity-10 text-primary border-0"
+                                style="font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 800;">
+                                {{ user.get_role_display|default:user.role }}
+                            </span>
+                            {% if user.role == 'EMPLOYEE' %}
+                            <span class="badge bg-info bg-opacity-10 text-info border-0"
+                                style="font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 800;">
+                                {{ user.get_level_display }}
+                            </span>
+                            {% endif %}
                         </div>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-3 p-2">
-                        <li><a class="dropdown-item rounded-3" href="{% url 'employee_profile' %}"><i
-                                    class="me-2 icon-sm" data-feather="user"></i> Profile</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-3 p-2 rounded-4">
+                        <li><a class="dropdown-item rounded-3 py-2" href="{% url 'employee_profile' %}"><i
+                                    class="me-2 icon-sm" data-feather="user"></i> Profile Details</a></li>
                         <li>
-                            <hr class="dropdown-divider">
+                            <hr class="dropdown-divider opacity-50">
                         </li>
-                        <li><a class="dropdown-item rounded-3 text-danger" href="{% url 'logout' %}"><i
-                                    class="me-2 icon-sm" data-feather="log-out"></i> Sign Out</a></li>
+                        <li><a class="dropdown-item rounded-3 py-2 text-danger" href="{% url 'logout' %}"><i
+                                    class="me-2 icon-sm" data-feather="log-out"></i> Secure Logout</a></li>
                     </ul>
                 </div>
             </div>
@@ -454,17 +488,10 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Init Feather Icons
-        feather.replace();
-
-        // Mobile Toggle
-        const sidebar = document.getElementById('sidebar');
-        const mobileToggle = document.getElementById('mobile-toggle');
-        if (mobileToggle) {
-            mobileToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('show');
-            });
-        }
+        // Init Feather Icons on load
+        document.addEventListener("DOMContentLoaded", () => {
+            feather.replace();
+        });
     </script>
     {% block extra_js %}{% endblock %}
 </body>
