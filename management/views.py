@@ -369,19 +369,17 @@ def hr_recruitment(request):
     else:
         form = JobOpeningForm()
 
-    # Use DB-level annotation for counts (reliable, single query) + prefetch candidates for monitor modal
-    jobs = list(
-        JobOpening.objects
-        .prefetch_related('candidates')
-        .annotate(
-            total_count=Count('candidates'),
-            applied_count=Count('candidates', filter=Q(candidates__status='APPLIED')),
-            interview_count=Count('candidates', filter=Q(candidates__status='INTERVIEW_SCHEDULED')),
-            hired_count=Count('candidates', filter=Q(candidates__status='HIRED')),
-            rejected_count=Count('candidates', filter=Q(candidates__status='REJECTED')),
-        )
-        .order_by('-posted_on')
-    )
+    # Fetch all jobs with candidates prefetched in one query
+    jobs = list(JobOpening.objects.prefetch_related('candidates').order_by('-posted_on'))
+
+    # Compute counts in Python from the prefetch cache (list() forces cache evaluation)
+    for job in jobs:
+        cands = list(job.candidates.all())   # reads from prefetch cache — no extra DB hits
+        job.total_count     = len(cands)
+        job.applied_count   = sum(1 for c in cands if c.status == 'APPLIED')
+        job.interview_count = sum(1 for c in cands if c.status == 'INTERVIEW_SCHEDULED')
+        job.hired_count     = sum(1 for c in cands if c.status == 'HIRED')
+        job.rejected_count  = sum(1 for c in cands if c.status == 'REJECTED')
 
     return render(request, 'hr/recruitment.html', {
         'jobs': jobs,
