@@ -455,34 +455,65 @@ def delete_job(request, job_id):
 def hr_shifts(request):
     if not (request.user.is_hr() or request.user.is_admin()): return redirect('dashboard')
     if request.method == 'POST':
-        # ... POST handling ...
-        emp_id = request.POST.get('employee_id')
-        start = request.POST.get('start_time')
-        end = request.POST.get('end_time')
-        day = request.POST.get('day')
-        s_type = request.POST.get('shift_type', 'DAY')
-        emp = get_object_or_404(CustomUser, id=emp_id)
-        Shift.objects.create(employee=emp, start_time=start, end_time=end, day_of_week=day, shift_type=s_type)
-        messages.success(request, f"Shift assigned to {emp.username}")
+        emp_id  = request.POST.get('employee_id', '').strip()
+        start   = request.POST.get('start_time', '').strip()
+        end     = request.POST.get('end_time', '').strip()
+        day     = request.POST.get('day', '').strip()
+        s_type  = request.POST.get('shift_type', 'DAY')
+
+        errors = []
+        if not emp_id:
+            errors.append("Please select an employee.")
+        if not start:
+            errors.append("Start time is required.")
+        if not end:
+            errors.append("End time is required.")
+        if start and end and start >= end:
+            errors.append("End time must be later than the start time.")
+
+        if errors:
+            for e in errors:
+                messages.error(request, e)
+        else:
+            emp = get_object_or_404(CustomUser, id=emp_id)
+            # Duplicate check: same employee on same day
+            if Shift.objects.filter(employee=emp, day_of_week=day).exists():
+                messages.warning(request, f"{emp.get_full_name() or emp.username} already has a shift on that day. Existing shift was replaced.")
+                Shift.objects.filter(employee=emp, day_of_week=day).delete()
+            Shift.objects.create(employee=emp, start_time=start, end_time=end, day_of_week=day, shift_type=s_type)
+            messages.success(request, f"Shift assigned to {emp.get_full_name() or emp.username} successfully.")
         return redirect('hr_shifts')
-    
+
     shifts = Shift.objects.all()
     employees = CustomUser.objects.filter(role='EMPLOYEE')
-    
+
     if not request.user.is_admin():
         shifts = shifts.filter(employee__department=request.user.department)
         employees = employees.filter(department=request.user.department)
-        
+
     return render(request, 'hr/shifts.html', {'shifts': shifts, 'employees': employees})
 
 @login_required
 def hr_documents(request):
     if not (request.user.is_hr() or request.user.is_admin()): return redirect('dashboard')
     if request.method == 'POST':
-        title = request.POST.get('title')
-        file = request.FILES.get('file')
-        Document.objects.create(title=title, file=file, uploaded_by=request.user)
-        messages.success(request, "Document uploaded!")
+        title = request.POST.get('title', '').strip()
+        file  = request.FILES.get('file')
+        errors = []
+        if not title:
+            errors.append("Document title is required.")
+        elif len(title) < 3:
+            errors.append("Document title must be at least 3 characters.")
+        if not file:
+            errors.append("Please select a file to upload.")
+        elif file.size > 20 * 1024 * 1024:  # 20 MB
+            errors.append("File size must not exceed 20 MB.")
+        if errors:
+            for e in errors:
+                messages.error(request, e)
+        else:
+            Document.objects.create(title=title, file=file, uploaded_by=request.user)
+            messages.success(request, f"Document '{title}' uploaded successfully!")
     docs = Document.objects.all()
     return render(request, 'hr/documents.html', {'docs': docs})
 
@@ -635,25 +666,46 @@ def hr_performance_reviews(request):
     reviews   = PerformanceReview.objects.select_related('employee', 'reviewer').order_by('-review_date')
 
     if request.method == 'POST':
-        emp_id       = request.POST.get('employee')
-        rating       = request.POST.get('rating')
-        prod_score   = request.POST.get('productivity_score', 0)
-        att_score    = request.POST.get('attendance_score', 0)
-        comments     = request.POST.get('comments', '')
-        try:
-            employee = CustomUser.objects.get(pk=emp_id)
-            PerformanceReview.objects.create(
-                employee=employee,
-                reviewer=request.user,
-                rating=int(rating),
-                productivity_score=float(prod_score),
-                attendance_score=float(att_score),
-                comments=comments,
-            )
-            SystemLog.objects.create(user=request.user, action=f"Added performance review for {employee.username}")
-            messages.success(request, f'Review submitted for {employee.get_full_name() or employee.username}!')
-        except Exception as e:
-            messages.error(request, f'Error saving review: {e}')
+        emp_id     = request.POST.get('employee', '').strip()
+        rating     = request.POST.get('rating', '').strip()
+        prod_score = request.POST.get('productivity_score', '75').strip()
+        att_score  = request.POST.get('attendance_score', '80').strip()
+        comments   = request.POST.get('comments', '').strip()
+
+        errors = []
+        if not emp_id:
+            errors.append("Please select an employee to review.")
+        if not rating:
+            errors.append("Please select a star rating (1–5).")
+        elif not rating.isdigit() or not (1 <= int(rating) <= 5):
+            errors.append("Rating must be a number between 1 and 5.")
+        if not comments:
+            errors.append("Manager comments cannot be empty.")
+        elif len(comments) < 10:
+            errors.append("Comments must be at least 10 characters long.")
+        elif len(comments) > 2000:
+            errors.append("Comments cannot exceed 2000 characters.")
+
+        if errors:
+            for e in errors:
+                messages.error(request, e)
+        else:
+            try:
+                employee = CustomUser.objects.get(pk=emp_id)
+                PerformanceReview.objects.create(
+                    employee=employee,
+                    reviewer=request.user,
+                    rating=int(rating),
+                    productivity_score=float(prod_score),
+                    attendance_score=float(att_score),
+                    comments=comments,
+                )
+                SystemLog.objects.create(user=request.user, action=f"Added performance review for {employee.username}")
+                messages.success(request, f'✅ Review submitted for {employee.get_full_name() or employee.username}!')
+            except CustomUser.DoesNotExist:
+                messages.error(request, 'Selected employee not found. Please try again.')
+            except Exception as e:
+                messages.error(request, f'Error saving review: {e}')
         return redirect('hr_performance_reviews')
 
     return render(request, 'hr/performance_reviews.html', {
@@ -695,16 +747,54 @@ def admin_performance_overview(request):
 
 @login_required
 def employee_profile(request):
+    import re
     if request.method == 'POST':
-        u = request.user
-        u.first_name = request.POST.get('first_name')
-        u.last_name = request.POST.get('last_name')
-        u.email = request.POST.get('email')
-        u.phone = request.POST.get('phone')
-        if request.FILES.get('profile_pic'):
-            u.profile_pic = request.FILES.get('profile_pic')
-        u.save()
-        messages.success(request, "Profile updated!")
+        u          = request.user
+        first_name = request.POST.get('first_name', '').strip()
+        last_name  = request.POST.get('last_name', '').strip()
+        email      = request.POST.get('email', '').strip()
+        phone      = request.POST.get('phone', '').strip()
+        pic        = request.FILES.get('profile_pic')
+
+        errors = []
+        if first_name and not re.match(r"^[a-zA-Z\s'\-]+$", first_name):
+            errors.append("First name may only contain letters, spaces, apostrophes, and hyphens.")
+        if last_name and not re.match(r"^[a-zA-Z\s'\-]+$", last_name):
+            errors.append("Last name may only contain letters, spaces, apostrophes, and hyphens.")
+        if email:
+            import re as _re
+            if not _re.match(r'^[\w.\+\-]+@[\w\-]+\.[a-zA-Z]{2,}$', email):
+                errors.append("Please enter a valid email address.")
+            else:
+                dup = CustomUser.objects.filter(email=email).exclude(pk=u.pk)
+                if dup.exists():
+                    errors.append("This email is already used by another account.")
+        if phone:
+            cleaned_phone = re.sub(r'[\s\-\(\)\+]', '', phone)
+            if not cleaned_phone.isdigit():
+                errors.append("Phone number must contain only digits.")
+            elif not (7 <= len(cleaned_phone) <= 15):
+                errors.append("Phone number must be between 7 and 15 digits.")
+        if pic:
+            if pic.size > 5 * 1024 * 1024:
+                errors.append("Profile picture must be smaller than 5 MB.")
+            if hasattr(pic, 'content_type') and pic.content_type not in ['image/jpeg', 'image/png', 'image/gif', 'image/webp']:
+                errors.append("Only JPEG, PNG, GIF, and WebP images are accepted as profile pictures.")
+
+        if errors:
+            for e in errors:
+                messages.error(request, e)
+        else:
+            u.first_name = first_name
+            u.last_name  = last_name
+            if email:
+                u.email = email
+            if phone:
+                u.phone = phone
+            if pic:
+                u.profile_pic = pic
+            u.save()
+            messages.success(request, "✅ Profile updated successfully!")
     return render(request, 'employee/profile.html')
 
 @login_required
@@ -757,24 +847,33 @@ def employee_feedback(request):
 @login_required
 def hr_manage_feedback(request):
     if not (request.user.is_hr() or request.user.is_admin()): return redirect('dashboard')
-    
+
     feedbacks = Feedback.objects.select_related('employee').all()
     if not request.user.is_admin():
         feedbacks = feedbacks.filter(employee__department=request.user.department)
-    
     feedbacks = feedbacks.order_by('is_resolved', '-created_at')
-    
+
     if request.method == 'POST':
-        fid = request.POST.get('feedback_id')
-        response = request.POST.get('hr_response')
-        feedback = get_object_or_404(Feedback, id=fid)
-        feedback.hr_response = response
-        feedback.responded_by = request.user
-        feedback.is_resolved = True
-        feedback.save()
-        messages.success(request, f"Responded to feedback from {feedback.employee.username}")
+        fid      = request.POST.get('feedback_id', '').strip()
+        response = request.POST.get('hr_response', '').strip()
+
+        if not fid:
+            messages.error(request, "Invalid feedback reference. Please try again.")
+        elif not response:
+            messages.error(request, "Response cannot be empty. Please write a reply before submitting.")
+        elif len(response) < 5:
+            messages.error(request, "Response is too short. Please provide a meaningful reply (at least 5 characters).")
+        elif len(response) > 2000:
+            messages.error(request, "Response cannot exceed 2000 characters.")
+        else:
+            feedback = get_object_or_404(Feedback, id=fid)
+            feedback.hr_response   = response
+            feedback.responded_by  = request.user
+            feedback.is_resolved   = True
+            feedback.save()
+            messages.success(request, f"✅ Responded to feedback from {feedback.employee.username}.")
         return redirect('hr_manage_feedback')
-        
+
     return render(request, 'hr/feedback_management.html', {'feedbacks': feedbacks})
 
 @login_required

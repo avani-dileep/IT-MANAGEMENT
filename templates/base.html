@@ -64,6 +64,31 @@
             z-index: 1000;
             transition: var(--transition);
             color: #94a3b8;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+        }
+
+        .sidebar-nav::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .sidebar-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 0.75rem 1rem;
+            flex-shrink: 0;
         }
 
         .sidebar-header {
@@ -101,6 +126,7 @@
             letter-spacing: -2px;
             background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
@@ -279,6 +305,54 @@
                 transform: translateX(0);
             }
         }
+
+        /* ── Global Validation Styles ─────────────────── */
+        .field-error {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+        }
+
+        .error-msg {
+            font-size: 0.78rem;
+            color: #ef4444;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+        }
+
+        /* Alert icon alignment */
+        .alert .alert-icon {
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+        }
+
+        .alert-error,
+        .alert-danger {
+            background: #fef2f2;
+            border: 1px solid #fee2e2;
+            color: #991b1b;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -420,19 +494,18 @@
                 </li>
                 {% endif %}
 
-                <li class="nav-caption">Account</li>
-                <li class="nav-item">
-                    <a href="{% url 'employee_profile' %}" class="nav-link">
-                        <i data-feather="user"></i> My Profile
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'logout' %}" class="nav-link text-danger">
-                        <i data-feather="log-out"></i> Logout
-                    </a>
-                </li>
             </ul>
         </nav>
+
+        <!-- Account / Logout — always pinned to bottom -->
+        <div class="sidebar-footer">
+            <a href="{% url 'employee_profile' %}" class="nav-link mb-1">
+                <i data-feather="user"></i> My Profile
+            </a>
+            <a href="{% url 'logout' %}" class="nav-link text-danger">
+                <i data-feather="log-out"></i> Logout
+            </a>
+        </div>
     </aside>
 
     <!-- Main Content wrapper -->
@@ -479,16 +552,40 @@
 
         <main class="content-area">
             {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 shadow-sm mb-4"
-                role="alert">
-                <div class="d-flex align-items-center gap-2">
-                    <i data-feather="info" class="icon-sm"></i>
-                    {{ message }}
+            <div id="global-messages" class="mb-3">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 shadow-sm mb-2 border-0"
+                    role="alert" style="animation: slideInDown 0.3s ease;">
+                    <div class="d-flex align-items-start gap-2">
+                        {% if message.tags == 'error' or message.tags == 'danger' %}
+                        <i data-feather="alert-triangle" class="alert-icon mt-1 flex-shrink-0"
+                            style="color:#ef4444;"></i>
+                        {% elif message.tags == 'success' %}
+                        <i data-feather="check-circle" class="alert-icon mt-1 flex-shrink-0" style="color:#22c55e;"></i>
+                        {% elif message.tags == 'warning' %}
+                        <i data-feather="alert-circle" class="alert-icon mt-1 flex-shrink-0" style="color:#f59e0b;"></i>
+                        {% else %}
+                        <i data-feather="info" class="alert-icon mt-1 flex-shrink-0" style="color:#3b82f6;"></i>
+                        {% endif %}
+                        <span>{{ message }}</span>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss"></button>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                {% endfor %}
             </div>
-            {% endfor %}
+            <style>
+                @keyframes slideInDown {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-12px);
+                    }
+
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            </style>
             {% endif %}
 
             {% block content %}{% endblock %}
@@ -498,9 +595,110 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Init Feather Icons on load
         document.addEventListener("DOMContentLoaded", () => {
+            // ── Init Feather Icons ────────────────────────────
             feather.replace();
+
+            // ── Auto-dismiss success messages after 5 s ──────
+            setTimeout(() => {
+                document.querySelectorAll('.alert-success').forEach(el => {
+                    const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
+                    bsAlert.close();
+                });
+            }, 5000);
+
+            // ── Global client-side form validation ───────────
+            // Attach to every form that has data-validate="true" OR any form with
+            // required inputs (we add it generically but skip file-only forms).
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function (e) {
+                    let hasError = false;
+
+                    // Clear previous errors
+                    form.querySelectorAll('.error-msg').forEach(el => el.remove());
+                    form.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
+
+                    const showError = (field, msg) => {
+                        field.classList.add('field-error');
+                        const err = document.createElement('div');
+                        err.className = 'error-msg';
+                        err.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>${msg}`;
+                        field.insertAdjacentElement('afterend', err);
+                        hasError = true;
+                    };
+
+                    // Check required fields
+                    form.querySelectorAll('[required]').forEach(field => {
+                        const val = field.value.trim();
+                        if (!val) {
+                            const label = form.querySelector(`label[for="${field.id}"]`) || form.querySelector(`label`);
+                            const fieldName = label ? label.textContent.trim().replace('*', '').trim() : (field.placeholder || 'This field');
+                            showError(field, `${fieldName} is required.`);
+                        }
+                    });
+
+                    // Email format
+                    form.querySelectorAll('input[type="email"]').forEach(field => {
+                        const val = field.value.trim();
+                        if (val && !/^[\w.+\-]+@[\w\-]+\.[a-zA-Z]{2,}$/.test(val)) {
+                            showError(field, 'Please enter a valid email address.');
+                        }
+                    });
+
+                    // Password min-length (only on fields with name containing "password")
+                    form.querySelectorAll('input[type="password"]').forEach(field => {
+                        const val = field.value;
+                        if (val && val.length < 8 && field.name !== 'current_password') {
+                            showError(field, 'Password must be at least 8 characters.');
+                        }
+                    });
+
+                    // Confirm password match
+                    const newPwd = form.querySelector('[name="new_password"]');
+                    const confirmPwd = form.querySelector('[name="confirm_password"]');
+                    if (newPwd && confirmPwd && newPwd.value && confirmPwd.value) {
+                        if (newPwd.value !== confirmPwd.value) {
+                            showError(confirmPwd, 'Passwords do not match.');
+                        }
+                    }
+
+                    // Date range: start ≤ end
+                    const startDate = form.querySelector('[name="start_date"]');
+                    const endDate = form.querySelector('[name="end_date"]');
+                    if (startDate && endDate && startDate.value && endDate.value) {
+                        if (endDate.value < startDate.value) {
+                            showError(endDate, 'End date must be on or after the start date.');
+                        }
+                    }
+
+                    // Time range: start < end  
+                    const startTime = form.querySelector('[name="start_time"]');
+                    const endTime = form.querySelector('[name="end_time"]');
+                    if (startTime && endTime && startTime.value && endTime.value) {
+                        if (endTime.value <= startTime.value) {
+                            showError(endTime, 'End time must be later than start time.');
+                        }
+                    }
+
+                    if (hasError) {
+                        e.preventDefault();
+                        // Scroll to first error
+                        const firstErr = form.querySelector('.field-error');
+                        if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+
+                // Live feedback: clear error as user types
+                form.querySelectorAll('input, select, textarea').forEach(field => {
+                    field.addEventListener('input', () => {
+                        field.classList.remove('field-error');
+                        const nextSib = field.nextElementSibling;
+                        if (nextSib && nextSib.classList.contains('error-msg')) {
+                            nextSib.remove();
+                        }
+                    });
+                });
+            });
         });
     </script>
     {% block extra_js %}{% endblock %}

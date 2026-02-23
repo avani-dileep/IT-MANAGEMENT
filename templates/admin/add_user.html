@@ -111,44 +111,60 @@
                     </div>
                 </div>
 
-                <form method="POST" enctype="multipart/form-data">
+                <form method="POST" enctype="multipart/form-data" id="addUserForm">
                     {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger border-0 rounded-3 p-3 mb-3">
+                        <ul class="mb-0 ps-3">
+                            {% for err in form.non_field_errors %}<li class="small">{{ err }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
 
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <div class="form-group-custom">
+                            <div class="form-group-custom {% if form.first_name.errors %}border-danger{% endif %}">
                                 <label class="form-label">First Name</label>
                                 {{ form.first_name }}
+                                {% for err in form.first_name.errors %}<div class="error-msg">{{ err }}</div>{% endfor
+                                %}
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group-custom">
+                            <div class="form-group-custom {% if form.last_name.errors %}border-danger{% endif %}">
                                 <label class="form-label">Last Name</label>
                                 {{ form.last_name }}
+                                {% for err in form.last_name.errors %}<div class="error-msg">{{ err }}</div>{% endfor %}
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group-custom">
-                                <label class="form-label">Security Username</label>
+                            <div class="form-group-custom {% if form.username.errors %}border-danger{% endif %}">
+                                <label class="form-label">Security Username <span class="text-danger">*</span></label>
                                 {{ form.username }}
+                                {% for err in form.username.errors %}<div class="error-msg">{{ err }}</div>{% endfor %}
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group-custom">
-                                <label class="form-label">Initial Password</label>
+                            <div class="form-group-custom {% if form.password.errors %}border-danger{% endif %}">
+                                <label class="form-label">Initial Password <span class="text-danger">*</span></label>
                                 {{ form.password }}
+                                <small class="text-muted" style="font-size:0.7rem;">Min. 8 characters</small>
+                                {% for err in form.password.errors %}<div class="error-msg">{{ err }}</div>{% endfor %}
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group-custom">
+                            <div class="form-group-custom {% if form.email.errors %}border-danger{% endif %}">
                                 <label class="form-label">Email Node</label>
                                 {{ form.email }}
+                                {% for err in form.email.errors %}<div class="error-msg">{{ err }}</div>{% endfor %}
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group-custom">
+                            <div class="form-group-custom {% if form.phone.errors %}border-danger{% endif %}">
                                 <label class="form-label">Contact Line</label>
                                 {{ form.phone }}
+                                {% for err in form.phone.errors %}<div class="error-msg">{{ err }}</div>{% endfor %}
                             </div>
                         </div>
                         <div class="col-md-6">

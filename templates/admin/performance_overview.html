@@ -214,8 +214,8 @@
         </div>
         Employee Ratings Leaderboard
     </div>
-    <span style="font-size:12px;color:#9ca3af;font-weight:700;">{{ reviews|length }} total review{{
-        reviews|length|pluralize }}</span>
+    <span style="font-size:12px;color:#9ca3af;font-weight:700;">
+        {{ reviews|length }} total review{{ reviews|length|pluralize }}</span>
 </div>
 
 <div class="po-grid">
@@ -282,10 +282,10 @@
                             <img src="https://ui-avatars.com/api/?name={{ r.employee.username }}&background=6366f1&color=fff"
                                 class="tbl-avatar" alt="">
                             <div>
-                                <div style="font-weight:800;color:#1e1e2d;">{{
-                                    r.employee.get_full_name|default:r.employee.username }}</div>
-                                <div style="font-size:10.5px;color:#9ca3af;">{{
-                                    r.employee.get_department_display|default:"—" }}</div>
+                                <div style="font-weight:800;color:#1e1e2d;">
+                                    {{ r.employee.get_full_name|default:r.employee.username }}</div>
+                                <div style="font-size:10.5px;color:#9ca3af;">
+                                    {{ r.employee.get_department_display|default:"—" }}</div>
                             </div>
                         </div>
                     </td>
@@ -298,13 +298,11 @@
                         </div>
                     </td>
                     <td>
-                        <span class="score-dot"
-                            style="background:{% if r.productivity_score >= 75 %}#22c55e{% elif r.productivity_score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};"></span>
+                        <span class="score-dot" data-score="{{ r.productivity_score }}"></span>
                         {{ r.productivity_score }}%
                     </td>
                     <td>
-                        <span class="score-dot"
-                            style="background:{% if r.attendance_score >= 75 %}#22c55e{% elif r.attendance_score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};"></span>
+                        <span class="score-dot" data-score="{{ r.attendance_score }}"></span>
                         {{ r.attendance_score }}%
                     </td>
                     <td style="max-width:200px;font-style:italic;color:#6b7280;font-size:12px;">
@@ -330,6 +328,18 @@
 </div>
 
 <script>
+    // Colour score dots based on value
+    document.querySelectorAll('.score-dot[data-score]').forEach(function (dot) {
+        var score = parseFloat(dot.getAttribute('data-score'));
+        if (score >= 75) {
+            dot.style.background = '#22c55e';
+        } else if (score >= 50) {
+            dot.style.background = '#f59e0b';
+        } else {
+            dot.style.background = '#ef4444';
+        }
+    });
+
     function filterTable() {
         const q = document.getElementById('searchInput').value.toLowerCase();
         document.querySelectorAll('#reviewTable tbody tr').forEach(row => {

@@ -124,32 +124,45 @@
                         class="avatar-preview shadow-sm">
                 </div>
 
-                <form method="POST" enctype="multipart/form-data">
+                <form method="POST" enctype="multipart/form-data" id="editUserForm">
                     {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger border-0 rounded-3 p-3 mb-3">
+                        <ul class="mb-0 ps-3">
+                            {% for err in form.non_field_errors %}<li class="small">{{ err }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
 
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <div class="form-group-custom">
+                            <div class="form-group-custom {% if form.first_name.errors %}border-danger{% endif %}">
                                 <label class="form-label">First Name</label>
                                 {{ form.first_name }}
+                                {% for err in form.first_name.errors %}<div class="error-msg">{{ err }}</div>{% endfor
+                                %}
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group-custom">
+                            <div class="form-group-custom {% if form.last_name.errors %}border-danger{% endif %}">
                                 <label class="form-label">Last Name</label>
                                 {{ form.last_name }}
+                                {% for err in form.last_name.errors %}<div class="error-msg">{{ err }}</div>{% endfor %}
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group-custom">
-                                <label class="form-label">Username</label>
+                            <div class="form-group-custom {% if form.username.errors %}border-danger{% endif %}">
+                                <label class="form-label">Username <span class="text-danger">*</span></label>
                                 {{ form.username }}
+                                {% for err in form.username.errors %}<div class="error-msg">{{ err }}</div>{% endfor %}
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group-custom">
+                            <div class="form-group-custom {% if form.email.errors %}border-danger{% endif %}">
                                 <label class="form-label">Email Node</label>
                                 {{ form.email }}
+                                {% for err in form.email.errors %}<div class="error-msg">{{ err }}</div>{% endfor %}
                             </div>
                         </div>
                         <div class="col-md-6">
