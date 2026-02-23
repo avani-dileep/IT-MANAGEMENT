@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -591,8 +591,107 @@ def cancel_leave(request, leave_id):
 
 @login_required
 def employee_performance(request):
-    reviews = request.user.performance_reviews.all().order_by('-review_date')
-    return render(request, 'employee/performance.html', {'reviews': reviews})
+    user = request.user
+    reviews = user.performance_reviews.all().order_by('-review_date')
+
+    # Real KPIs derived from existing data
+    total_tasks      = user.assigned_tasks.count()
+    done_tasks       = user.assigned_tasks.filter(status='DONE').count()
+    inprog_tasks     = user.assigned_tasks.filter(status='IN_PROGRESS').count()
+    task_completion  = round((done_tasks / total_tasks * 100), 1) if total_tasks else 0
+
+    attendance_days  = user.attendance.count()
+    present_days     = user.attendance.exclude(check_in=None).count()
+    attendance_pct   = round((present_days / attendance_days * 100), 1) if attendance_days else 0
+
+    leaves_taken     = user.leave_requests.filter(status='APPROVED').count()
+    active_projects  = user.projects.filter(status='ONGOING').count()
+
+    avg_rating = 0
+    if reviews.exists():
+        avg_rating = round(sum(r.rating for r in reviews) / reviews.count(), 1)
+
+    context = {
+        'reviews': reviews,
+        'total_tasks': total_tasks,
+        'done_tasks': done_tasks,
+        'inprog_tasks': inprog_tasks,
+        'task_completion': task_completion,
+        'attendance_days': attendance_days,
+        'present_days': present_days,
+        'attendance_pct': attendance_pct,
+        'leaves_taken': leaves_taken,
+        'active_projects': active_projects,
+        'avg_rating': avg_rating,
+    }
+    return render(request, 'employee/performance.html', context)
+
+
+@login_required
+def hr_performance_reviews(request):
+    """HR: list all reviews they gave + add a new review."""
+    from .models import PerformanceReview, CustomUser
+    employees = CustomUser.objects.filter(role='EMPLOYEE')
+    reviews   = PerformanceReview.objects.select_related('employee', 'reviewer').order_by('-review_date')
+
+    if request.method == 'POST':
+        emp_id       = request.POST.get('employee')
+        rating       = request.POST.get('rating')
+        prod_score   = request.POST.get('productivity_score', 0)
+        att_score    = request.POST.get('attendance_score', 0)
+        comments     = request.POST.get('comments', '')
+        try:
+            employee = CustomUser.objects.get(pk=emp_id)
+            PerformanceReview.objects.create(
+                employee=employee,
+                reviewer=request.user,
+                rating=int(rating),
+                productivity_score=float(prod_score),
+                attendance_score=float(att_score),
+                comments=comments,
+            )
+            SystemLog.objects.create(user=request.user, action=f"Added performance review for {employee.username}")
+            messages.success(request, f'Review submitted for {employee.get_full_name() or employee.username}!')
+        except Exception as e:
+            messages.error(request, f'Error saving review: {e}')
+        return redirect('hr_performance_reviews')
+
+    return render(request, 'hr/performance_reviews.html', {
+        'employees': employees,
+        'reviews': reviews,
+    })
+
+
+@login_required
+def hr_delete_performance_review(request, review_id):
+    """HR: delete a review."""
+    from .models import PerformanceReview
+    try:
+        review = PerformanceReview.objects.get(pk=review_id, reviewer=request.user)
+        emp_name = review.employee.username
+        review.delete()
+        SystemLog.objects.create(user=request.user, action=f"Deleted performance review for {emp_name}")
+        messages.success(request, 'Review deleted.')
+    except PerformanceReview.DoesNotExist:
+        messages.error(request, 'Review not found or you do not have permission.')
+    return redirect('hr_performance_reviews')
+
+
+@login_required
+def admin_performance_overview(request):
+    """Admin: view all performance reviews."""
+    from .models import PerformanceReview, CustomUser
+    reviews   = PerformanceReview.objects.select_related('employee', 'reviewer').order_by('-review_date')
+    employees = CustomUser.objects.filter(role='EMPLOYEE')
+    avg_by_emp = []
+    for emp in employees:
+        emp_reviews = reviews.filter(employee=emp)
+        avg = round(sum(r.rating for r in emp_reviews) / emp_reviews.count(), 1) if emp_reviews.exists() else None
+        avg_by_emp.append({'employee': emp, 'avg': avg, 'count': emp_reviews.count()})
+    return render(request, 'admin/performance_overview.html', {
+        'reviews': reviews,
+        'avg_by_emp': avg_by_emp,
+    })
 
 @login_required
 def employee_profile(request):
@@ -677,6 +776,31 @@ def hr_manage_feedback(request):
         return redirect('hr_manage_feedback')
         
     return render(request, 'hr/feedback_management.html', {'feedbacks': feedbacks})
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password', '')
+        new_password = request.POST.get('new_password', '')
+        confirm_password = request.POST.get('confirm_password', '')
+
+        u = request.user
+
+        if not u.check_password(current_password):
+            messages.error(request, 'Current password is incorrect.')
+        elif new_password != confirm_password:
+            messages.error(request, 'New passwords do not match.')
+        elif len(new_password) < 8:
+            messages.error(request, 'New password must be at least 8 characters.')
+        else:
+            u.set_password(new_password)
+            u.save()
+            update_session_auth_hash(request, u)  # Keep user logged in
+            SystemLog.objects.create(user=u, action="Changed account password")
+            messages.success(request, 'Password changed successfully!')
+
+    return redirect('employee_profile')
+
 
 @login_required
 def admin_feedback_view(request):

@@ -68,15 +68,17 @@
                             </h6>
                             {% with shift=user.shifts.all.first %}
                             {% if shift %}
-                            <div class="d-flex align-items-center gap-3">
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
                                 <div>
-                                    <div class="display-6 fw-bold text-dark">{{ shift.start_time|time:"H:i" }}</div>
-                                    <div class="small text-muted fw-bold">Check-in Expected</div>
+                                    <div class="fw-bold text-dark" style="font-size:18px;line-height:1.2;">
+                                        {{shift.start_time|time:"H:i" }}</div>
+                                    <div class="text-muted fw-bold" style="font-size:10px;">Check-in</div>
                                 </div>
-                                <div class="text-secondary opacity-25 fs-2">→</div>
+                                <div class="text-secondary opacity-25" style="font-size:16px;">→</div>
                                 <div>
-                                    <div class="display-6 fw-bold text-dark">{{ shift.end_time|time:"H:i" }}</div>
-                                    <div class="small text-muted fw-bold">Check-out Target</div>
+                                    <div class="fw-bold text-dark" style="font-size:18px;line-height:1.2;">
+                                       {{ shift.end_time|time:"H:i" }}</div>
+                                    <div class="text-muted fw-bold" style="font-size:10px;">Check-out</div>
                                 </div>
                             </div>
                             <div class="mt-4">

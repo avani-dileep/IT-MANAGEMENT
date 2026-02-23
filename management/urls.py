@@ -44,7 +44,11 @@ urlpatterns = [
     path('employee/leave/cancel/<int:leave_id>/', views.cancel_leave, name='cancel_leave'),
     path('employee/performance/', views.employee_performance, name='employee_performance'),
     path('employee/profile/', views.employee_profile, name='employee_profile'),
+    path('employee/change-password/', views.change_password, name='change_password'),
     path('employee/announcements/', views.employee_announcements, name='employee_announcements'),
     path('employee/feedback/', views.employee_feedback, name='employee_feedback'),
     path('company-admin/feedback/', views.admin_feedback_view, name='admin_feedback_view'),
+    path('hr/performance/', views.hr_performance_reviews, name='hr_performance_reviews'),
+    path('hr/performance/delete/<int:review_id>/', views.hr_delete_performance_review, name='hr_delete_performance_review'),
+    path('company-admin/performance/', views.admin_performance_overview, name='admin_performance_overview'),
 ]

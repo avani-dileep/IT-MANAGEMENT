@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+{% block title %}Performance Overview{% endblock %}
+{% block page_title %}Performance Overview{% endblock %}
+
+{% block extra_css %}
+<style>
+    .po-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .emp-rank-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1.5px solid #e9eaf3;
+        padding: 20px;
+        box-shadow: 0 4px 16px rgba(80, 80, 160, 0.06);
+        text-align: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .emp-rank-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 28px rgba(80, 80, 160, 0.12);
+    }
+
+    .emp-avatar-big {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        object-fit: cover;
+        margin: 0 auto 10px;
+        display: block;
+        border: 2px solid #f1f5f9;
+    }
+
+    .emp-name-big {
+        font-size: 14px;
+        font-weight: 800;
+        color: #1e1e2d;
+        margin-bottom: 2px;
+    }
+
+    .emp-dept {
+        font-size: 11px;
+        color: #9ca3af;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .stars-sm {
+        display: flex;
+        justify-content: center;
+        gap: 2px;
+        margin-bottom: 8px;
+    }
+
+    .s-fill {
+        color: #f59e0b;
+    }
+
+    .s-empty {
+        color: #e5e7eb;
+    }
+
+    .avg-badge {
+        font-size: 20px;
+        font-weight: 900;
+        color: #1e1e2d;
+    }
+
+    .avg-sub {
+        font-size: 10.5px;
+        color: #9ca3af;
+        font-weight: 700;
+    }
+
+    .no-review-badge {
+        font-size: 11.5px;
+        color: #b0b7c9;
+        background: #f8fafc;
+        border-radius: 99px;
+        padding: 4px 14px;
+        font-weight: 700;
+        display: inline-block;
+        margin-top: 8px;
+    }
+
+    /* Review table */
+    .review-table-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1.5px solid #e9eaf3;
+        box-shadow: 0 4px 18px rgba(80, 80, 160, 0.06);
+        overflow: hidden;
+    }
+
+    .rt-header {
+        padding: 20px 24px;
+        border-bottom: 1.5px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .search-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #f8fafc;
+        border: 1.5px solid #e9eaf3;
+        border-radius: 10px;
+        padding: 7px 14px;
+        width: 220px;
+    }
+
+    .search-box input {
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 13px;
+        font-weight: 600;
+        color: #1e293b;
+        font-family: inherit;
+        width: 100%;
+    }
+
+    table.rv-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .rv-table th {
+        font-size: 9.5px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: #9ca3af;
+        padding: 12px 20px;
+        text-align: left;
+        border-bottom: 1.5px solid #f1f5f9;
+        background: #fafafa;
+    }
+
+    .rv-table td {
+        padding: 14px 20px;
+        border-bottom: 1px solid #f9fafb;
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+        vertical-align: middle;
+    }
+
+    .rv-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .rv-table tr:hover td {
+        background: #fafbff;
+    }
+
+    .tbl-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        object-fit: cover;
+    }
+
+    .tbl-stars {
+        display: flex;
+        gap: 2px;
+    }
+
+    .score-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 5px;
+        vertical-align: middle;
+    }
+
+    .section-box-title {
+        font-size: 15px;
+        font-weight: 800;
+        color: #1e1e2d;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .title-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ══ Employee Rating Leaderboard ══ -->
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+    <div class="section-box-title">
+        <div class="title-icon" style="background:rgba(245,158,11,0.10);">
+            <i data-feather="award" style="width:15px;height:15px;color:#f59e0b;"></i>
+        </div>
+        Employee Ratings Leaderboard
+    </div>
+    <span style="font-size:12px;color:#9ca3af;font-weight:700;">{{ reviews|length }} total review{{
+        reviews|length|pluralize }}</span>
+</div>
+
+<div class="po-grid">
+    {% for item in avg_by_emp %}
+    <div class="emp-rank-card">
+        <img src="https://ui-avatars.com/api/?name={{ item.employee.username }}&background=6366f1&color=fff"
+            class="emp-avatar-big" alt="">
+        <div class="emp-name-big">{{ item.employee.get_full_name|default:item.employee.username }}</div>
+        <div class="emp-dept">{{ item.employee.get_department_display|default:"No Dept" }}</div>
+
+        {% if item.avg %}
+        <div class="stars-sm">
+            {% for i in "12345" %}
+            <i data-feather="star" style="width:14px;height:14px;"
+                class="{% if forloop.counter <= item.avg %}s-fill{% else %}s-empty{% endif %}"></i>
+            {% endfor %}
+        </div>
+        <div class="avg-badge">{{ item.avg }}<span style="font-size:13px;color:#9ca3af;">/5</span></div>
+        <div class="avg-sub">{{ item.count }} review{{ item.count|pluralize }}</div>
+        {% else %}
+        <div class="no-review-badge">No Reviews Yet</div>
+        {% endif %}
+    </div>
+    {% empty %}
+    <div style="grid-column:1/-1;text-align:center;color:#9ca3af;padding:30px;">
+        No employees found.
+    </div>
+    {% endfor %}
+</div>
+
+<!-- ══ All Reviews Table ══ -->
+<div class="review-table-card">
+    <div class="rt-header">
+        <div class="section-box-title">
+            <div class="title-icon" style="background:rgba(99,102,241,0.10);">
+                <i data-feather="clipboard" style="width:15px;height:15px;color:#6366f1;"></i>
+            </div>
+            All Performance Reviews
+        </div>
+        <div class="search-box">
+            <i data-feather="search" style="width:14px;height:14px;color:#b0b7c9;flex-shrink:0;"></i>
+            <input type="text" id="searchInput" placeholder="Search employee…" oninput="filterTable()">
+        </div>
+    </div>
+
+    <div style="overflow-x:auto;">
+        <table class="rv-table" id="reviewTable">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Rating</th>
+                    <th>Productivity</th>
+                    <th>Attendance</th>
+                    <th>Comments</th>
+                    <th>Reviewer</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reviews %}
+                <tr>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <img src="https://ui-avatars.com/api/?name={{ r.employee.username }}&background=6366f1&color=fff"
+                                class="tbl-avatar" alt="">
+                            <div>
+                                <div style="font-weight:800;color:#1e1e2d;">{{
+                                    r.employee.get_full_name|default:r.employee.username }}</div>
+                                <div style="font-size:10.5px;color:#9ca3af;">{{
+                                    r.employee.get_department_display|default:"—" }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tbl-stars">
+                            {% for i in "12345" %}
+                            <i data-feather="star" style="width:13px;height:13px;"
+                                class="{% if forloop.counter <= r.rating %}s-fill{% else %}s-empty{% endif %}"></i>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="score-dot"
+                            style="background:{% if r.productivity_score >= 75 %}#22c55e{% elif r.productivity_score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};"></span>
+                        {{ r.productivity_score }}%
+                    </td>
+                    <td>
+                        <span class="score-dot"
+                            style="background:{% if r.attendance_score >= 75 %}#22c55e{% elif r.attendance_score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};"></span>
+                        {{ r.attendance_score }}%
+                    </td>
+                    <td style="max-width:200px;font-style:italic;color:#6b7280;font-size:12px;">
+                        {{ r.comments|truncatewords:12 }}
+                    </td>
+                    <td>
+                        <div style="font-size:12px;font-weight:700;color:#6b7280;">
+                            {{ r.reviewer.get_full_name|default:r.reviewer.username }}
+                        </div>
+                    </td>
+                    <td style="font-size:12px;color:#9ca3af;white-space:nowrap;">{{ r.review_date|date:"M d, Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align:center;padding:40px;color:#9ca3af;">
+                        No performance reviews have been submitted yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function filterTable() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('#reviewTable tbody tr').forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+    }
+</script>
+{% endblock %}

@@ -1,50 +1,512 @@
 {% extends 'base.html' %}
-{% block title %}Performance Analysis{% endblock %}
+{% block title %}Performance Evaluation{% endblock %}
+{% block page_title %}Performance Evaluation{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── KPI Cards ── */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    @media (max-width: 900px) {
+        .kpi-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 500px) {
+        .kpi-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .kpi-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1.5px solid #e9eaf3;
+        padding: 20px 22px;
+        box-shadow: 0 4px 18px rgba(80, 80, 160, 0.06);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s;
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .kpi-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 14px;
+    }
+
+    .kpi-value {
+        font-size: 26px;
+        font-weight: 800;
+        color: #1e1e2d;
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+
+    .kpi-label {
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .kpi-sub {
+        font-size: 11px;
+        color: #b0b7c9;
+        margin-top: 6px;
+    }
+
+    .kpi-bg-decor {
+        position: absolute;
+        right: -10px;
+        bottom: -10px;
+        opacity: 0.05;
+    }
+
+    /* ── Progress Section ── */
+    .perf-section {
+        background: #fff;
+        border-radius: 20px;
+        border: 1.5px solid #e9eaf3;
+        padding: 26px;
+        box-shadow: 0 4px 18px rgba(80, 80, 160, 0.06);
+        margin-bottom: 24px;
+    }
+
+    .section-title {
+        font-size: 15px;
+        font-weight: 800;
+        color: #1e1e2d;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Animated Progress bars */
+    .perf-bar-wrap {
+        margin-bottom: 18px;
+    }
+
+    .perf-bar-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+    }
+
+    .perf-bar-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #374151;
+    }
+
+    .perf-bar-value {
+        font-size: 13px;
+        font-weight: 800;
+        color: #6366f1;
+    }
+
+    .perf-bar-track {
+        height: 8px;
+        background: #f0f0f8;
+        border-radius: 99px;
+        overflow: hidden;
+    }
+
+    .perf-bar-fill {
+        height: 100%;
+        border-radius: 99px;
+        width: 0;
+        transition: width 1.2s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    /* ── Reviews Timeline ── */
+    .review-timeline {
+        position: relative;
+    }
+
+    .review-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1.5px solid #e9eaf3;
+        padding: 22px 24px;
+        margin-bottom: 18px;
+        box-shadow: 0 3px 14px rgba(80, 80, 160, 0.05);
+        transition: box-shadow 0.2s;
+    }
+
+    .review-card:hover {
+        box-shadow: 0 8px 28px rgba(80, 80, 160, 0.12);
+    }
+
+    .stars {
+        display: flex;
+        gap: 3px;
+    }
+
+    .star-filled {
+        color: #f59e0b;
+    }
+
+    .star-empty {
+        color: #e5e7eb;
+    }
+
+    .review-meta {
+        font-size: 11px;
+        color: #9ca3af;
+        font-weight: 700;
+    }
+
+    .review-comment {
+        font-size: 13.5px;
+        color: #4b5563;
+        line-height: 1.7;
+        border-left: 3px solid #e9eaf3;
+        padding-left: 14px;
+        margin: 14px 0;
+        font-style: italic;
+    }
+
+    .reviewer-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #f8fafc;
+        border-radius: 99px;
+        padding: 4px 12px 4px 6px;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #6b7280;
+    }
+
+    /* Avg rating big display */
+    .avg-rating-wrap {
+        text-align: center;
+        padding: 20px 0 10px;
+    }
+
+    .avg-rating-num {
+        font-size: 52px;
+        font-weight: 900;
+        color: #1e1e2d;
+        line-height: 1;
+    }
+
+    .avg-rating-max {
+        font-size: 18px;
+        font-weight: 600;
+        color: #9ca3af;
+    }
+
+    .avg-stars {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        margin-top: 8px;
+    }
+
+    /* Empty state */
+    .empty-reviews {
+        text-align: center;
+        padding: 40px 20px;
+        color: #9ca3af;
+    }
+
+    /* Layout grid */
+    .perf-layout {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 20px;
+        align-items: start;
+    }
+
+    @media (max-width: 900px) {
+        .perf-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="page-header px-4 py-4">
-    <h2 class="page-title">Performance Analysis & Evaluation</h2>
-    <div class="text-muted small mt-1">Review your productivity and attendance metrics</div>
+
+<!-- ══ KPI Stats Row ══ -->
+<div class="kpi-grid">
+
+    <!-- Task Completion -->
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(99,102,241,0.10);">
+            <i data-feather="check-circle" style="width:18px;height:18px;color:#6366f1;"></i>
+        </div>
+        <div class="kpi-value">{{ done_tasks }}<span style="font-size:14px;color:#9ca3af;">/{{ total_tasks }}</span>
+        </div>
+        <div class="kpi-label">Tasks Completed</div>
+        <div class="kpi-sub">{{ task_completion }}% completion rate</div>
+        <i data-feather="check-circle" class="kpi-bg-decor" style="width:80px;height:80px;color:#6366f1;"></i>
+    </div>
+
+    <!-- Attendance -->
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(34,197,94,0.10);">
+            <i data-feather="user-check" style="width:18px;height:18px;color:#22c55e;"></i>
+        </div>
+        <div class="kpi-value">{{ present_days }}<span style="font-size:14px;color:#9ca3af;">/
+                {{ attendance_days }}</span></div>
+        <div class="kpi-label">Days Present</div>
+        <div class="kpi-sub">{{ attendance_pct }}% attendance rate</div>
+        <i data-feather="user-check" class="kpi-bg-decor" style="width:80px;height:80px;color:#22c55e;"></i>
+    </div>
+
+    <!-- Active Projects -->
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(245,158,11,0.10);">
+            <i data-feather="briefcase" style="width:18px;height:18px;color:#f59e0b;"></i>
+        </div>
+        <div class="kpi-value">{{ active_projects }}</div>
+        <div class="kpi-label">Active Projects</div>
+        <div class="kpi-sub">Currently ongoing</div>
+        <i data-feather="briefcase" class="kpi-bg-decor" style="width:80px;height:80px;color:#f59e0b;"></i>
+    </div>
+
+    <!-- HR Rating -->
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(239,68,68,0.10);">
+            <i data-feather="star" style="width:18px;height:18px;color:#ef4444;"></i>
+        </div>
+        <div class="kpi-value">{% if avg_rating %}{{ avg_rating }}<span
+                style="font-size:14px;color:#9ca3af;">/5</span>{% else %}—{% endif %}</div>
+        <div class="kpi-label">Avg HR Rating</div>
+        <div class="kpi-sub">From {{ reviews|length }} review{{ reviews|length|pluralize }}</div>
+        <i data-feather="star" class="kpi-bg-decor" style="width:80px;height:80px;color:#ef4444;"></i>
+    </div>
+
 </div>
 
-<div class="px-4">
-    <div class="row">
-        {% for r in reviews %}
-        <div class="col-md-6 mb-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Review: {{ r.review_date|date }}</h5>
-                    <div class="badge bg-soft-primary text-primary">Rating: {{ r.rating }}/5</div>
+<!-- ══ Main 2-column layout ══ -->
+<div class="perf-layout">
+
+    <!-- Left: Progress bars + Reviews -->
+    <div>
+        <!-- Progress Metrics -->
+        <div class="perf-section">
+            <div class="section-title">
+                <div class="section-icon" style="background:rgba(99,102,241,0.10);">
+                    <i data-feather="activity" style="width:15px;height:15px;color:#6366f1;"></i>
                 </div>
-                <div class="card-body">
-                    <div class="row mb-4">
-                        <div class="col-6 text-center border-end">
-                            <div class="h3 mb-0 text-primary">{{ r.productivity_score }}%</div>
-                            <div class="small text-muted">Productivity</div>
-                        </div>
-                        <div class="col-6 text-center">
-                            <div class="h3 mb-0 text-success">{{ r.attendance_score }}%</div>
-                            <div class="small text-muted">Attendance</div>
-                        </div>
+                My Performance Metrics
+            </div>
+
+            <div class="perf-bar-wrap">
+                <div class="perf-bar-header">
+                    <span class="perf-bar-label">📋 Task Completion Rate</span>
+                    <span class="perf-bar-value">{{ task_completion }}%</span>
+                </div>
+                <div class="perf-bar-track">
+                    <div class="perf-bar-fill" data-width="{{ task_completion }}"
+                        style="background: linear-gradient(90deg, #6366f1, #a78bfa);"></div>
+                </div>
+            </div>
+
+            <div class="perf-bar-wrap">
+                <div class="perf-bar-header">
+                    <span class="perf-bar-label">🗓️ Attendance Rate</span>
+                    <span class="perf-bar-value" style="color:#22c55e;">{{ attendance_pct }}%</span>
+                </div>
+                <div class="perf-bar-track">
+                    <div class="perf-bar-fill" data-width="{{ attendance_pct }}"
+                        style="background: linear-gradient(90deg, #22c55e, #4ade80);"></div>
+                </div>
+            </div>
+
+            <div class="perf-bar-wrap">
+                <div class="perf-bar-header">
+                    <span class="perf-bar-label">⚡ In-Progress Tasks</span>
+                    <span class="perf-bar-value" style="color:#f59e0b;">{{ inprog_tasks }}</span>
+                </div>
+                <div class="perf-bar-track">
+                    <div class="perf-bar-fill"
+                        data-width="{% if total_tasks %}{% widthratio inprog_tasks total_tasks 100 %}{% else %}0{% endif %}"
+                        style="background: linear-gradient(90deg, #f59e0b, #fcd34d);"></div>
+                </div>
+            </div>
+
+            {% if avg_rating %}
+            <div class="perf-bar-wrap">
+                <div class="perf-bar-header">
+                    <span class="perf-bar-label">⭐ HR Avg Rating</span>
+                    <span class="perf-bar-value" style="color:#ef4444;">{{ avg_rating }}/5</span>
+                </div>
+                <div class="perf-bar-track">
+                    <div class="perf-bar-fill" data-width="{% widthratio avg_rating 5 100 %}"
+                        style="background: linear-gradient(90deg, #ef4444, #fb923c);"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- HR Reviews Timeline -->
+        <div class="section-title" style="margin-bottom:16px;">
+            <div class="section-icon" style="background:rgba(245,158,11,0.10);">
+                <i data-feather="clipboard" style="width:15px;height:15px;color:#f59e0b;"></i>
+            </div>
+            HR Evaluation Reviews
+        </div>
+
+        {% for r in reviews %}
+        <div class="review-card">
+            <div
+                style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+                <div>
+                    <div class="stars">
+                        {% for i in "12345" %}
+                        {% if forloop.counter <= r.rating %} <i data-feather="star" style="width:16px;height:16px;"
+                            class="star-filled"></i>
+                            {% else %}
+                            <i data-feather="star" style="width:16px;height:16px;" class="star-empty"></i>
+                            {% endif %}
+                            {% endfor %}
                     </div>
-                    <h6>Manager Comments:</h6>
-                    <p class="text-muted small">{{ r.comments }}</p>
-                    <div class="mt-3 text-end pt-3 border-top">
-                        <span class="small text-muted">Reviewed by: {{
-                            r.reviewer.get_full_name|default:r.reviewer.username }}</span>
+                    <div class="review-meta" style="margin-top:4px;">{{ r.review_date|date:"F d, Y" }}</div>
+                </div>
+                <div style="display:flex;gap:10px;">
+                    <div style="text-align:center;">
+                        <div style="font-size:13px;font-weight:800;color:#6366f1;">{{ r.productivity_score }}%</div>
+                        <div style="font-size:9.5px;color:#9ca3af;font-weight:700;">Productivity</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:13px;font-weight:800;color:#22c55e;">{{ r.attendance_score }}%</div>
+                        <div style="font-size:9.5px;color:#9ca3af;font-weight:700;">Attendance</div>
                     </div>
                 </div>
             </div>
+
+            <div class="review-comment">{{ r.comments }}</div>
+
+            <div class="reviewer-chip">
+                <img src="https://ui-avatars.com/api/?name={{ r.reviewer.username }}&size=20&background=6366f1&color=fff"
+                    style="width:20px;height:20px;border-radius:50%;">
+                Reviewed by {{ r.reviewer.get_full_name|default:r.reviewer.username }}
+            </div>
         </div>
         {% empty %}
-        <div class="col-12 text-center py-5">
-            <div class="card card-body border-0 shadow-sm">
-                <i class="feather-trending-up text-muted mb-3" style="font-size: 3rem;"></i>
-                <h5>No performance reviews yet</h5>
-                <p class="text-muted">Your evaluations and productivity metrics will appear here once reviewed by
-                    management.</p>
+        <div class="perf-section empty-reviews">
+            <i data-feather="clipboard" style="width:52px;height:52px;opacity:0.2;margin-bottom:12px;"></i>
+            <h5 style="color:#9ca3af;font-weight:700;">No HR Reviews Yet</h5>
+            <p style="font-size:13px;">Your HR manager will add your performance review here after evaluation cycles.
+            </p>
+            <div
+                style="background:rgba(99,102,241,0.06);border-radius:12px;padding:14px 20px;margin-top:16px;font-size:12.5px;color:#6b7280;line-height:1.8;">
+                💡 <strong>Tip:</strong> Keep completing tasks on time, maintain good attendance, and submit your work
+                reports to score higher in reviews.
             </div>
         </div>
         {% endfor %}
     </div>
+
+    <!-- Right: Summary Panel -->
+    <div>
+        <!-- Overall Rating Widget -->
+        {% if avg_rating %}
+        <div class="perf-section" style="margin-bottom:20px;">
+            <div class="section-title">
+                <div class="section-icon" style="background:rgba(245,158,11,0.10);">
+                    <i data-feather="award" style="width:15px;height:15px;color:#f59e0b;"></i>
+                </div>
+                Overall Rating
+            </div>
+            <div class="avg-rating-wrap">
+                <div class="avg-rating-num">{{ avg_rating }}<span class="avg-rating-max">/5</span></div>
+                <div class="avg-stars">
+                    {% for i in "12345" %}
+                    <i data-feather="star" style="width:20px;height:20px;"
+                        class="{% if forloop.counter <= avg_rating %}star-filled{% else %}star-empty{% endif %}"></i>
+                    {% endfor %}
+                </div>
+                <div style="font-size:12px;color:#9ca3af;margin-top:10px;">Based on {{ reviews|length }} review{{
+                    reviews|length|pluralize }}</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Quick Summary -->
+        <div class="perf-section">
+            <div class="section-title">
+                <div class="section-icon" style="background:rgba(34,197,94,0.10);">
+                    <i data-feather="bar-chart-2" style="width:15px;height:15px;color:#22c55e;"></i>
+                </div>
+                Quick Summary
+            </div>
+
+            {% for item in summary_items %}{% endfor %}
+
+            <div style="display:flex;flex-direction:column;gap:12px;">
+                <div
+                    style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8fafc;border-radius:10px;">
+                    <span style="font-size:12.5px;font-weight:700;color:#6b7280;">✅ Completed Tasks</span>
+                    <span style="font-size:13px;font-weight:800;color:#6366f1;">{{ done_tasks }}</span>
+                </div>
+                <div
+                    style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8fafc;border-radius:10px;">
+                    <span style="font-size:12.5px;font-weight:700;color:#6b7280;">⏳ In Progress</span>
+                    <span style="font-size:13px;font-weight:800;color:#f59e0b;">{{ inprog_tasks }}</span>
+                </div>
+                <div
+                    style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8fafc;border-radius:10px;">
+                    <span style="font-size:12.5px;font-weight:700;color:#6b7280;">📅 Days Present</span>
+                    <span style="font-size:13px;font-weight:800;color:#22c55e;">{{ present_days }}</span>
+                </div>
+                <div
+                    style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8fafc;border-radius:10px;">
+                    <span style="font-size:12.5px;font-weight:700;color:#6b7280;">🏖️ Leaves Taken</span>
+                    <span style="font-size:13px;font-weight:800;color:#ef4444;">{{ leaves_taken }}</span>
+                </div>
+                <div
+                    style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8fafc;border-radius:10px;">
+                    <span style="font-size:12.5px;font-weight:700;color:#6b7280;">🚀 Active Projects</span>
+                    <span style="font-size:13px;font-weight:800;color:#8b5cf6;">{{ active_projects }}</span>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
 </div>
+
+<script>
+    // Animate progress bars on load
+    document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(() => {
+            document.querySelectorAll('.perf-bar-fill').forEach(bar => {
+                const w = bar.getAttribute('data-width') || 0;
+                bar.style.width = Math.min(parseFloat(w), 100) + '%';
+            });
+        }, 200);
+    });
+</script>
 {% endblock %}

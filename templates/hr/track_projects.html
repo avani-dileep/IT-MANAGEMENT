@@ -3,225 +3,453 @@
 {% block page_title %}Operational Intelligence{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold text-dark mb-0">Project Portfolio Monitoring</h4>
-    <a href="{% url 'add_project' %}"
-        class="btn btn-primary d-flex align-items-center gap-2 px-4 rounded-pill shadow-sm">
-        <i data-feather="plus-square" class="icon-sm"></i> Schedule New Project
+
+<style>
+    .project-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+
+    @media (max-width: 1100px) {
+        .project-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 680px) {
+        .project-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .proj-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 24px rgba(80, 80, 160, 0.08);
+        border: 1.5px solid #e9eaf3;
+        overflow: hidden;
+        transition: transform 0.25s cubic-bezier(.4, 0, .2, 1), box-shadow 0.25s;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .proj-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 36px rgba(80, 80, 160, 0.14);
+    }
+
+    .proj-card-body {
+        padding: 26px 24px 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .proj-icon-badge {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(99, 102, 241, 0.10);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6366f1;
+        flex-shrink: 0;
+    }
+
+    .proj-status-badge {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+
+    .status-completed {
+        background: rgba(34, 197, 94, 0.12);
+        color: #16a34a;
+    }
+
+    .status-inprogress {
+        background: rgba(99, 102, 241, 0.12);
+        color: #6366f1;
+    }
+
+    .status-pending {
+        background: rgba(245, 158, 11, 0.12);
+        color: #d97706;
+    }
+
+    .proj-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1e1e2d;
+        margin-bottom: 6px;
+        line-height: 1.4;
+    }
+
+    .proj-desc {
+        font-size: 13px;
+        color: #6b7280;
+        line-height: 1.6;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 42px;
+        margin-bottom: 18px;
+    }
+
+    .velocity-label {
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .velocity-value {
+        font-size: 13px;
+        font-weight: 800;
+        color: #1e1e2d;
+    }
+
+    .prog-bar-track {
+        height: 6px;
+        background: #f0f0f8;
+        border-radius: 99px;
+        overflow: hidden;
+    }
+
+    .prog-bar-fill {
+        height: 100%;
+        border-radius: 99px;
+        background: linear-gradient(90deg, #6366f1, #a78bfa);
+        transition: width 0.8s ease;
+    }
+
+    .proj-footer {
+        padding: 14px 24px;
+        border-top: 1.5px solid #f1f1f8;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .avatar-stack {
+        display: flex;
+        align-items: center;
+    }
+
+    .avatar-stack img,
+    .avatar-stack .avatar-more {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        margin-left: -8px;
+        object-fit: cover;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.10);
+    }
+
+    .avatar-stack img:first-child,
+    .avatar-stack .avatar-more:first-child {
+        margin-left: 0;
+    }
+
+    .avatar-more {
+        background: #e9eaf3;
+        color: #6366f1;
+        font-size: 10px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-analyze {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        border: none;
+        border-radius: 99px;
+        padding: 6px 18px;
+        font-size: 12.5px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+
+    .btn-analyze:hover {
+        opacity: 0.88;
+    }
+
+    .btn-edit-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1.5px solid #d1d5db;
+        background: #fff;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, border-color 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-edit-circle:hover {
+        background: #f3f4f6;
+        border-color: #9ca3af;
+    }
+
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 80px 20px;
+        color: #9ca3af;
+    }
+
+    .page-header-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .page-header-bar h4 {
+        font-size: 22px;
+        font-weight: 800;
+        color: #1e1e2d;
+        margin: 0;
+    }
+
+    .btn-new-project {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        border: none;
+        border-radius: 99px;
+        padding: 10px 24px;
+        font-size: 13.5px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.30);
+        transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .btn-new-project:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+        color: #fff;
+    }
+</style>
+
+<!-- Page Header -->
+<div class="page-header-bar">
+    <h4>🗂️ Project Portfolio Monitoring</h4>
+    <a href="{% url 'add_project' %}" class="btn-new-project">
+        <i data-feather="plus-square" style="width:16px;height:16px;"></i>
+        Schedule New Project
     </a>
 </div>
-<div class="row g-4">
+
+<!-- Project Grid (3 columns) -->
+<div class="project-grid">
     {% for p in projects %}
-    <div class="col-md-6 col-xl-4">
-        <div class="card h-100 border-0 shadow-sm overflow-hidden card-hover">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div class="bg-primary bg-opacity-10 p-2 rounded-3 text-primary">
-                        <i data-feather="box" style="width: 20px; height: 20px;"></i>
-                    </div>
-                    <span
-                        class="badge {% if p.status == 'COMPLETED' %}bg-success bg-opacity-10 text-success{% else %}bg-primary bg-opacity-10 text-primary{% endif %} rounded-pill px-3 py-2 fw-bold small">
-                        {{ p.status|title }}
-                    </span>
+
+    <!-- Project Card -->
+    <div class="proj-card">
+        <div class="proj-card-body">
+            <!-- Top Row: icon + status -->
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
+                <div class="proj-icon-badge">
+                    <i data-feather="box" style="width:20px;height:20px;"></i>
                 </div>
+                <span class="proj-status-badge
+                    {% if p.status == 'COMPLETED' %}status-completed
+                    {% elif p.status == 'IN_PROGRESS' %}status-inprogress
+                    {% else %}status-pending{% endif %}">
+                    {{ p.status|title }}
+                </span>
+            </div>
 
-                <h5 class="fw-bold text-dark mb-2">{{ p.name }}</h5>
-                <p class="text-secondary small mb-4 line-clamp-2" style="min-height: 40px;">{{ p.description }}</p>
+            <!-- Project Name & Description -->
+            <div class="proj-title">{{ p.name }}</div>
+            <div class="proj-desc">{{ p.description }}</div>
 
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between small mb-2">
-                        <span class="text-secondary fw-bold">Velocity</span>
-                        <span class="text-dark fw-bold">{{ p.calculate_progress|default:0 }}%</span>
-                    </div>
-                    <div class="progress rounded-pill overflow-hidden" style="height: 6px;">
-                        <div class="progress-bar bg-primary shadow-none" role="progressbar"
-                            style="--w: {{ p.calculate_progress|default:0 }}%; width: var(--w);"></div>
-                    </div>
+            <!-- Progress Bar -->
+            <div style="margin-top:auto;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <span class="velocity-label">Velocity</span>
+                    <span class="velocity-value">{{ p.calculate_progress|default:0 }}%</span>
                 </div>
-
-                <div class="d-flex align-items-center gap-3 pt-3 border-top">
-                    <div class="flex-grow-1">
-                        <div class="d-flex -space-x-2">
-                            {% for m in p.team_members.all|slice:":3" %}
-                            <img src="https://ui-avatars.com/api/?name={{ m.username }}&background=random"
-                                class="rounded-circle border border-2 border-white shadow-sm"
-                                style="width: 28px; height: 28px;" title="{{ m.get_full_name|default:m.username }}">
-                            {% endfor %}
-                            {% if p.team_members.count > 3 %}
-                            <div class="rounded-circle bg-light border border-2 border-white d-flex align-items-center justify-content-center small fw-bold text-muted"
-                                style="width: 28px; height: 28px;">+{{ p.team_members.count|add:"-3" }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <a href="{% url 'edit_project' p.id %}"
-                            class="btn btn-sm btn-outline-dark rounded-circle d-flex align-items-center justify-content-center p-0"
-                            style="width: 34px; height: 34px;" title="Edit Module">
-                            <i data-feather="edit-2" style="width: 14px; height: 14px;"></i>
-                        </a>
-                        <button class="btn btn-sm btn-dark rounded-pill px-3 fw-bold d-flex align-items-center gap-2"
-                            data-bs-toggle="modal" data-bs-target="#projDetails{{ p.id }}">
-                            <i data-feather="pie-chart" style="width: 14px; height: 14px;"></i>
-                            Analyze
-                        </button>
-                    </div>
+                <div class="prog-bar-track">
+                    <div class="prog-bar-fill" style="width: {{ p.calculate_progress|default:0 }}%;"></div>
                 </div>
-
             </div>
         </div>
 
-        <!-- Premium Detail Modal (Moved outside card to prevent interaction conflicts) -->
-        <div class="modal fade" id="projDetails{{ p.id }}" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                    <div class="modal-header border-0 p-4 pb-0">
-                        <h5 class="modal-title fw-bold">Project Specification</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body p-4">
-                        <div class="bg-light p-3 rounded-4 mb-4">
-                            <h4 class="fw-bold text-dark mb-1">{{ p.name }}</h4>
-                            <p class="text-secondary small mb-0">{{ p.description }}</p>
-                        </div>
+        <!-- Footer: Avatars + Actions -->
+        <div class="proj-footer">
+            <div class="avatar-stack">
+                {% for m in p.team_members.all|slice:":3" %}
+                <img src="https://ui-avatars.com/api/?name={{ m.username }}&background=random"
+                    title="{{ m.get_full_name|default:m.username }}" alt="{{ m.username }}">
+                {% endfor %}
+                {% if p.team_members.count > 3 %}
+                <div class="avatar-more">+{{ p.team_members.count|add:"-3" }}</div>
+                {% endif %}
+            </div>
 
-                        <div class="row g-3 mb-4">
-                            <div class="col-6">
-                                <div class="p-3 border rounded-3 bg-white">
-                                    <label
-                                        class="d-block small text-muted fw-bold text-uppercase mb-1">Initiated</label>
-                                    <div class="d-flex align-items-center gap-2 text-dark fw-medium">
-                                        <i data-feather="calendar" class="icon-sm text-primary"></i>
-                                        {{ p.start_date|date:"M d, Y" }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="p-3 border rounded-3 bg-white">
-                                    <label class="d-block small text-muted fw-bold text-uppercase mb-1">Deadline</label>
-                                    <div class="d-flex align-items-center gap-2 text-dark fw-medium">
-                                        <i data-feather="flag" class="icon-sm text-danger"></i>
-                                        {{ p.end_date|date:"M d, Y" }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-2">
-                            <label class="small text-muted fw-bold text-uppercase d-block mb-3">Resource
-                                Allocation</label>
-                            <div class="d-flex flex-wrap gap-2 mb-4">
-                                {% for m in p.team_members.all %}
-                                <span
-                                    class="badge bg-white text-dark border p-2 px-3 rounded-3 fw-medium d-flex align-items-center gap-2">
-                                    <img src="https://ui-avatars.com/api/?name={{ m.username }}&size=16"
-                                        class="rounded-circle">
-                                    {{ m.get_full_name|default:m.username }}
-                                </span>
-                                {% empty %}
-                                <div class="alert alert-soft-warning w-100 py-2 small">No active resources assigned.
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-
-                        <div class="mb-0">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <label class="small text-muted fw-bold text-uppercase mb-0">Task Deliverables</label>
-                                <a href="{% url 'add_task' p.id %}"
-                                    class="btn btn-sm btn-primary rounded-pill px-3 fw-bold">
-                                    <i data-feather="plus" class="icon-sm"></i> Add Task
-                                </a>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-sm align-middle">
-                                    <thead>
-                                        <tr>
-                                            <th class="extra-small text-muted text-uppercase">Task</th>
-                                            <th class="extra-small text-muted text-uppercase">Assignee</th>
-                                            <th class="extra-small text-muted text-uppercase">Report</th>
-                                            <th class="extra-small text-muted text-uppercase text-end">Progress</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for t in p.tasks.all %}
-                                        <tr>
-                                            <td>
-                                                <div class="small fw-bold text-dark">{{ t.title }}</div>
-                                            </td>
-                                            <td>
-                                                <div class="extra-small text-muted">@{{ t.assigned_to.username }}</div>
-                                            </td>
-                                            <td>
-                                                {% if t.report %}
-                                                <a href="{{ t.report.url }}" target="_blank"
-                                                    class="btn btn-link btn-sm p-0 text-primary">
-                                                    <i data-feather="download" class="icon-sm"></i> View
-                                                </a>
-                                                {% else %}
-                                                <span class="extra-small text-muted">Pending</span>
-                                                {% endif %}
-                                            </td>
-                                            <td class="text-end">
-                                                <div
-                                                    class="small fw-bold {% if t.status == 'DONE' %}text-success{% elif t.status == 'IN_PROGRESS' %}text-primary{% else %}text-warning{% endif %}">
-                                                    {{ t.progress }}%
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        {% empty %}
-                                        <tr>
-                                            <td colspan="3" class="text-center py-3">
-                                                <div class="extra-small text-muted opacity-50">No tasks defined.</div>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-0 p-4 pt-0 gap-2">
-                        <button type="button" class="btn btn-light rounded-pill px-4 flex-grow-1"
-                            data-bs-dismiss="modal">Close Brief</button>
-                        {% if p.all_tasks_completed and p.status != 'COMPLETED' %}
-                        <a href="{% url 'complete_project' p.id %}"
-                            class="btn btn-success rounded-pill px-4 flex-grow-1 fw-bold border-0 shadow-sm">
-                            <i data-feather="check-circle" class="icon-sm me-1"></i> Finalize Project
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <a href="{% url 'edit_project' p.id %}" class="btn-edit-circle" title="Edit Project">
+                    <i data-feather="edit-2" style="width:13px;height:13px;"></i>
+                </a>
+                <button class="btn-analyze" data-bs-toggle="modal" data-bs-target="#projDetails{{ p.id }}">
+                    <i data-feather="pie-chart" style="width:13px;height:13px;"></i>
+                    Analyze
+                </button>
             </div>
         </div>
-        {% empty %}
-        <div class="col-12 text-center py-5">
-            <div class="py-5 opacity-50">
-                <i data-feather="clipboard" class="mb-3" style="width: 64px; height: 64px;"></i>
-                <h5 class="text-muted">Portfolio currently empty.</h5>
-            </div>
-        </div>
-        {% endfor %}
     </div>
 
-    <style>
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            line-clamp: 2;
-        }
+    <!-- Detail Modal -->
+    <div class="modal fade" id="projDetails{{ p.id }}" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius:20px;">
+                <div class="modal-header border-0 p-4 pb-0">
+                    <h5 class="modal-title fw-bold">Project Specification</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="bg-light p-3 rounded-4 mb-4">
+                        <h4 class="fw-bold text-dark mb-1">{{ p.name }}</h4>
+                        <p class="text-secondary small mb-0">{{ p.description }}</p>
+                    </div>
 
-        .-space-x-2>*+* {
-            margin-left: -0.5rem;
-        }
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="p-3 border rounded-3 bg-white">
+                                <label class="d-block small text-muted fw-bold text-uppercase mb-1">Initiated</label>
+                                <div class="d-flex align-items-center gap-2 text-dark fw-medium">
+                                    <i data-feather="calendar" class="icon-sm text-primary"></i>
+                                    {{ p.start_date|date:"M d, Y" }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border rounded-3 bg-white">
+                                <label class="d-block small text-muted fw-bold text-uppercase mb-1">Deadline</label>
+                                <div class="d-flex align-items-center gap-2 text-dark fw-medium">
+                                    <i data-feather="flag" class="icon-sm text-danger"></i>
+                                    {{ p.end_date|date:"M d, Y" }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-        .card-hover {
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+                    <div class="mb-2">
+                        <label class="small text-muted fw-bold text-uppercase d-block mb-3">Resource Allocation</label>
+                        <div class="d-flex flex-wrap gap-2 mb-4">
+                            {% for m in p.team_members.all %}
+                            <span
+                                class="badge bg-white text-dark border p-2 px-3 rounded-3 fw-medium d-flex align-items-center gap-2">
+                                <img src="https://ui-avatars.com/api/?name={{ m.username }}&size=16"
+                                    class="rounded-circle">
+                                {{ m.get_full_name|default:m.username }}
+                            </span>
+                            {% empty %}
+                            <div class="alert alert-soft-warning w-100 py-2 small">No active resources assigned.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
 
-        .card-hover:hover {
-            transform: translateY(-5px);
-        }
-    </style>
-    {% endblock %}
+                    <div class="mb-0">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <label class="small text-muted fw-bold text-uppercase mb-0">Task Deliverables</label>
+                            <a href="{% url 'add_task' p.id %}"
+                                class="btn btn-sm btn-primary rounded-pill px-3 fw-bold">
+                                <i data-feather="plus" class="icon-sm"></i> Add Task
+                            </a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle">
+                                <thead>
+                                    <tr>
+                                        <th class="extra-small text-muted text-uppercase">Task</th>
+                                        <th class="extra-small text-muted text-uppercase">Assignee</th>
+                                        <th class="extra-small text-muted text-uppercase">Report</th>
+                                        <th class="extra-small text-muted text-uppercase text-end">Progress</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for t in p.tasks.all %}
+                                    <tr>
+                                        <td>
+                                            <div class="small fw-bold text-dark">{{ t.title }}</div>
+                                        </td>
+                                        <td>
+                                            <div class="extra-small text-muted">@{{ t.assigned_to.username }}</div>
+                                        </td>
+                                        <td>
+                                            {% if t.report %}
+                                            <a href="{{ t.report.url }}" target="_blank"
+                                                class="btn btn-link btn-sm p-0 text-primary">
+                                                <i data-feather="download" class="icon-sm"></i> View
+                                            </a>
+                                            {% else %}
+                                            <span class="extra-small text-muted">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <div
+                                                class="small fw-bold {% if t.status == 'DONE' %}text-success{% elif t.status == 'IN_PROGRESS' %}text-primary{% else %}text-warning{% endif %}">
+                                                {{ t.progress }}%
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-3">
+                                            <div class="extra-small text-muted opacity-50">No tasks defined.</div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0 gap-2">
+                    <button type="button" class="btn btn-light rounded-pill px-4 flex-grow-1"
+                        data-bs-dismiss="modal">Close Brief</button>
+                    {% if p.all_tasks_completed and p.status != 'COMPLETED' %}
+                    <a href="{% url 'complete_project' p.id %}"
+                        class="btn btn-success rounded-pill px-4 flex-grow-1 fw-bold border-0 shadow-sm">
+                        <i data-feather="check-circle" class="icon-sm me-1"></i> Finalize Project
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% empty %}
+    <div class="empty-state">
+        <i data-feather="clipboard" style="width:64px;height:64px;opacity:0.3;"></i>
+        <h5 class="mt-3" style="color:#9ca3af;">Portfolio currently empty.</h5>
+        <p style="font-size:13px;">Click "Schedule New Project" to get started.</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

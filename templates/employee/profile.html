@@ -4,213 +4,553 @@
 
 {% block extra_css %}
 <style>
-    .content-area {
-        padding: 1.25rem !important;
+    /* ── Layout ── */
+    .profile-layout {
+        display: grid;
+        grid-template-columns: 1fr 420px;
+        gap: 24px;
+        align-items: start;
     }
 
-    .card-premium {
+    @media (max-width: 1024px) {
+        .profile-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ── Shared Card ── */
+    .pcard {
         background: #fff;
-        border-radius: 30px;
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+        border-radius: 22px;
+        border: 1.5px solid #e9eaf3;
+        box-shadow: 0 8px 32px rgba(80, 80, 160, 0.07);
+        overflow: hidden;
     }
 
-    .form-group-custom {
-        background: #ffffff;
-        border-radius: 12px;
-        padding: 0.6rem 1rem;
-        border: 2px solid #f1f5f9;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-        margin-bottom: 0.5rem;
-    }
-
-    .form-group-custom:hover {
-        border-color: #e2e8f0;
-        transform: translateY(-2px);
-    }
-
-    .form-group-custom:focus-within {
-        border-color: var(--primary);
-        box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.2);
-    }
-
-    .form-label {
-        font-size: 0.65rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #94a3b8;
-        margin-bottom: 0 !important;
-        display: block;
-    }
-
-    .form-group-custom input {
-        background: transparent !important;
-        border: none !important;
-        outline: none !important;
-        box-shadow: none !important;
-        padding: 0.1rem 0 !important;
-        width: 100% !important;
-        font-weight: 700 !important;
-        color: #1e293b !important;
-        font-size: 1rem !important;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    .form-group-custom input[type="file"] {
-        font-size: 0.85rem !important;
-        color: #64748b !important;
-    }
-
-    .form-group-custom input:focus {
-        color: var(--primary) !important;
-    }
-
-    .btn-gradient {
-        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-        color: #fff;
-        border: none;
-        padding: 0.85rem 3rem;
-        border-radius: 16px;
-        font-weight: 800;
-        letter-spacing: 0.5px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .btn-gradient:hover {
-        transform: translateY(-3px) scale(1.03);
-        box-shadow: 0 20px 40px rgba(79, 70, 229, 0.4);
-        color: #fff;
-    }
-
-    .profile-hero {
-        height: 140px;
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        border-radius: 20px 20px 0 0;
-        position: relative;
-        border-bottom: 1px solid #f1f5f9;
-    }
-
-    .profile-avatar-wrapper {
-        margin-top: -60px;
-        margin-left: 30px;
-        position: relative;
-        z-index: 2;
+    /* ── Profile Hero ── */
+    .profile-hero-body {
+        padding: 20px 24px 20px;
     }
 
     .profile-avatar {
-        width: 110px;
-        height: 110px;
-        border-radius: 28px;
-        border: 5px solid #fff;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        width: 72px;
+        height: 72px;
+        border-radius: 18px;
+        border: 4px solid #f1f5f9;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10);
         object-fit: cover;
+        margin-top: 0;
+        display: block;
     }
 
-    .header {
-        height: 60px !important;
+    .profile-name {
+        font-size: 17px;
+        font-weight: 800;
+        color: #1e1e2d;
+        margin: 8px 0 4px;
+    }
+
+    .role-badge {
+        font-size: 10.5px;
+        font-weight: 700;
+        padding: 3px 12px;
+        border-radius: 99px;
+        background: rgba(99, 102, 241, 0.10);
+        color: #6366f1;
+        display: inline-block;
+    }
+
+    /* ── Form Groups ── */
+    .fg {
+        background: #f8fafc;
+        border-radius: 11px;
+        padding: 8px 14px;
+        border: 2px solid #f1f5f9;
+        transition: all 0.18s;
+        margin-bottom: 10px;
+    }
+
+    .fg:focus-within {
+        border-color: #6366f1;
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.10);
+    }
+
+    .fg label {
+        font-size: 9.5px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: #b0b7c9;
+        display: block;
+        margin-bottom: 1px;
+    }
+
+    .fg input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 13.5px;
+        font-weight: 700;
+        color: #1e293b;
+        padding: 0;
+        font-family: inherit;
+    }
+
+    .fg input:disabled {
+        color: #adb5bd;
+    }
+
+    /* ── Buttons ── */
+    .btn-save {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 28px;
+        font-size: 13px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        transition: opacity 0.2s, transform 0.2s;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.28);
+    }
+
+    .btn-save:hover {
+        opacity: 0.88;
+        transform: translateY(-2px);
+    }
+
+    /* ── Right: Change Password ── */
+    .pwd-section-title {
+        font-size: 15px;
+        font-weight: 800;
+        color: #1e1e2d;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 4px;
+    }
+
+    .pwd-icon-wrap {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        background: rgba(99, 102, 241, 0.10);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .pwd-subtitle {
+        font-size: 11.5px;
+        color: #9ca3af;
+        margin-bottom: 20px;
+    }
+
+    .pwd-fg {
+        background: #f8fafc;
+        border-radius: 11px;
+        padding: 9px 14px;
+        border: 2px solid #f1f5f9;
+        transition: all 0.18s;
+        margin-bottom: 12px;
+    }
+
+    .pwd-fg:focus-within {
+        border-color: #6366f1;
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.10);
+    }
+
+    .pwd-fg label {
+        font-size: 9.5px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: #b0b7c9;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .pwd-row {
+        display: flex;
+        align-items: center;
+    }
+
+    .pwd-row input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 14px;
+        font-weight: 700;
+        color: #1e293b;
+        padding: 0;
+        font-family: inherit;
+    }
+
+    .eye-btn {
+        background: none;
+        border: none;
+        color: #b0b7c9;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        transition: color 0.2s;
+    }
+
+    .eye-btn:hover {
+        color: #6366f1;
+    }
+
+    /* Strength bar */
+    .str-bar {
+        display: flex;
+        gap: 4px;
+        margin: 4px 0 2px;
+    }
+
+    .str-seg {
+        flex: 1;
+        height: 4px;
+        border-radius: 99px;
+        background: #eef0f8;
+        transition: background 0.3s;
+    }
+
+    .str-lbl {
+        font-size: 10.5px;
+        font-weight: 700;
+        color: #b0b7c9;
+        margin-bottom: 4px;
+    }
+
+    .match-hint {
+        font-size: 11px;
+        font-weight: 700;
+        margin-top: -6px;
+        margin-bottom: 8px;
+        display: none;
+    }
+
+    .btn-update-pwd {
+        width: 100%;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 11px;
+        font-size: 13.5px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: opacity 0.2s, transform 0.2s;
+        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.28);
+        margin-top: 4px;
+    }
+
+    .btn-update-pwd:hover {
+        opacity: 0.88;
+        transform: translateY(-2px);
+    }
+
+    .info-note {
+        text-align: center;
+        font-size: 10.5px;
+        color: #b0b7c9;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .divider-label {
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: #d1d5db;
+        margin: 16px 0 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .divider-label::before,
+    .divider-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #f1f5f9;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="card card-premium overflow-hidden">
-    <div class="profile-hero"></div>
-    <div class="card-body p-4 pt-0">
-        <div class="profile-avatar-wrapper d-flex align-items-end justify-content-between mb-4">
-            <div class="d-flex align-items-end gap-4">
-                <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}https://ui-avatars.com/api/?name={{ user.username }}&background=6366f1&color=fff{% endif %}"
-                    class="profile-avatar">
-                <div class="pb-2">
-                    <h2 class="fw-bold mb-1 text-dark">{{ user.get_full_name|default:user.username }}</h2>
-                    <div class="d-flex align-items-center gap-2">
-                        <span
-                            class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-4 py-1 fw-bold extra-small"
-                            style="font-size: 11px;">
-                            {{ user.get_role_display|default:user.role }}
-                        </span>
-                        {% if user.role == 'EMPLOYEE' %}
-                        <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-4 py-1 fw-bold extra-small"
-                            style="font-size: 11px;">
-                            {{ user.get_level_display }}
-                        </span>
-                        {% endif %}
-                        <span class="small text-muted fw-bold">ID: #EMP-{{ user.id|stringformat:"04d" }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="profile-layout">
 
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <div class="form-group-custom">
-                        <label class="form-label">First Name</label>
-                        <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group-custom">
-                        <label class="form-label">Last Name</label>
-                        <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group-custom">
-                        <label class="form-label">Official Email</label>
-                        <input type="email" name="email" class="form-control" value="{{ user.email }}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group-custom">
-                        <label class="form-label">Primary Phone</label>
-                        <input type="text" name="phone" class="form-control" value="{{ user.phone|default:'' }}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group-custom bg-light opacity-75">
-                        <label class="form-label">Official Department</label>
-                        <input type="text" class="form-control"
-                            value="{{ user.get_department_display|default:'Not Assigned' }}" disabled>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group-custom bg-light opacity-75">
-                        <label class="form-label">Specialized Designation</label>
-                        <input type="text" class="form-control" value="{{ user.designation|default:'Staff Member' }}"
-                            disabled>
-                    </div>
-                </div>
+    <!-- ═══ LEFT: Profile Info ═══ -->
+    <div class="pcard">
+        <div class="profile-hero-body">
+            <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}https://ui-avatars.com/api/?name={{ user.username }}&background=6366f1&color=fff{% endif %}"
+                class="profile-avatar" alt="Avatar">
+
+            <div class="profile-name">{{ user.get_full_name|default:user.username }}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
+                <span class="role-badge">{{ user.get_role_display|default:user.role }}</span>
                 {% if user.role == 'EMPLOYEE' %}
-                <div class="col-md-6">
-                    <div class="form-group-custom bg-light opacity-75">
-                        <label class="form-label">Experience Level</label>
-                        <input type="text" class="form-control" value="{{ user.get_level_display }}" disabled>
+                <span class="role-badge" style="background:rgba(14,165,233,0.10);color:#0ea5e9;">{{
+                    user.get_level_display }}</span>
+                {% endif %}
+                <span style="font-size:10.5px;color:#9ca3af;font-weight:700;align-self:center;">
+                    ID: #EMP-{{ user.id|stringformat:"04d" }}
+                </span>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="fg">
+                            <label>First Name</label>
+                            <input type="text" name="first_name" value="{{ user.first_name }}">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="fg">
+                            <label>Last Name</label>
+                            <input type="text" name="last_name" value="{{ user.last_name }}">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="fg">
+                            <label>Email</label>
+                            <input type="email" name="email" value="{{ user.email }}">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="fg">
+                            <label>Phone</label>
+                            <input type="text" name="phone" value="{{ user.phone|default:'' }}">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="fg">
+                            <label>Department</label>
+                            <input type="text" value="{{ user.get_department_display|default:'Not Assigned' }}"
+                                disabled>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="fg">
+                            <label>Designation</label>
+                            <input type="text" value="{{ user.designation|default:'Staff Member' }}" disabled>
+                        </div>
+                    </div>
+                    {% if user.role == 'EMPLOYEE' %}
+                    <div class="col-6">
+                        <div class="fg">
+                            <label>Experience Level</label>
+                            <input type="text" value="{{ user.get_level_display }}" disabled>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="col-{% if user.role == 'EMPLOYEE' %}6{% else %}12{% endif %}">
+                        <div class="fg">
+                            <label>Profile Picture</label>
+                            <input type="file" name="profile_pic" id="id_profile_pic"
+                                style="font-size:12px;color:#64748b;">
+                        </div>
                     </div>
                 </div>
-                {% endif %}
-                <div class="col-md-6">
-                    <div class="form-group-custom">
-                        <label class="form-label">Avatar Asset Profile</label>
-                        <input type="file" name="profile_pic" id="id_profile_pic">
-                    </div>
+
+                <div class="d-flex align-items-center justify-content-between mt-3 pt-3"
+                    style="border-top:1.5px solid #f1f5f9;">
+                    <span style="font-size:11px;color:#b0b7c9;display:flex;align-items:center;gap:5px;">
+                        <i data-feather="lock" style="width:13px;height:13px;"></i> Secure & Encrypted
+                    </span>
+                    <button type="submit" class="btn-save">
+                        <i data-feather="save" style="width:14px;height:14px;"></i> Save Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══ RIGHT: Change Password ═══ -->
+    <div class="pcard" style="padding: 24px;">
+        <div class="pwd-section-title">
+            <div class="pwd-icon-wrap">
+                <i data-feather="shield" style="width:15px;height:15px;color:#6366f1;"></i>
+            </div>
+            Change Password
+        </div>
+        <div class="pwd-subtitle">Secure your account with a new password.</div>
+
+        <form method="POST" action="{% url 'change_password' %}" id="pwdForm">
+            {% csrf_token %}
+
+            <!-- Current Password -->
+            <div class="pwd-fg">
+                <label>Current Password</label>
+                <div class="pwd-row">
+                    <input type="password" name="current_password" id="id_cur" placeholder="••••••••"
+                        autocomplete="current-password" required>
+                    <button type="button" class="eye-btn" onclick="togglePwd('id_cur', this)">
+                        <i data-feather="eye" style="width:15px;height:15px;"></i>
+                    </button>
                 </div>
             </div>
 
-            <div class="mt-4 pt-4 border-top d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="p-2 bg-light rounded-2 text-muted shadow-sm">
-                        <i data-feather="lock" class="icon-sm"></i>
-                    </div>
-                    <span class="small text-secondary fw-bold">Encrypted Connection</span>
+            <div class="divider-label">New Credentials</div>
+
+            <!-- New Password -->
+            <div class="pwd-fg">
+                <label>New Password</label>
+                <div class="pwd-row">
+                    <input type="password" name="new_password" id="id_new" placeholder="••••••••"
+                        autocomplete="new-password" oninput="checkStr(this.value); checkMatch();" required>
+                    <button type="button" class="eye-btn" onclick="togglePwd('id_new', this)">
+                        <i data-feather="eye" style="width:15px;height:15px;"></i>
+                    </button>
                 </div>
-                <button type="submit" class="btn btn-gradient d-flex align-items-center gap-2">
-                    <i data-feather="refresh-ccw" class="icon-sm"></i> Secure Save
-                </button>
+            </div>
+
+            <!-- Strength indicator -->
+            <div class="str-bar">
+                <div class="str-seg" id="s1"></div>
+                <div class="str-seg" id="s2"></div>
+                <div class="str-seg" id="s3"></div>
+                <div class="str-seg" id="s4"></div>
+            </div>
+            <div class="str-lbl" id="strLbl">Enter a strong password</div>
+
+            <!-- Confirm Password -->
+            <div class="pwd-fg">
+                <label>Confirm New Password</label>
+                <div class="pwd-row">
+                    <input type="password" name="confirm_password" id="id_conf" placeholder="••••••••"
+                        autocomplete="new-password" oninput="checkMatch();" required>
+                    <button type="button" class="eye-btn" onclick="togglePwd('id_conf', this)">
+                        <i data-feather="eye" style="width:15px;height:15px;"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="match-hint" id="matchHint"></div>
+
+            <!-- Requirements checklist -->
+            <div style="background:#f8fafc;border-radius:10px;padding:10px 14px;margin-bottom:14px;">
+                <div
+                    style="font-size:10px;font-weight:800;color:#b0b7c9;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;">
+                    Requirements</div>
+                <div class="req-item" id="req1"
+                    style="font-size:11.5px;color:#b0b7c9;display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                    <i data-feather="circle" style="width:11px;height:11px;"></i> At least 8 characters
+                </div>
+                <div class="req-item" id="req2"
+                    style="font-size:11.5px;color:#b0b7c9;display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                    <i data-feather="circle" style="width:11px;height:11px;"></i> One uppercase letter
+                </div>
+                <div class="req-item" id="req3"
+                    style="font-size:11.5px;color:#b0b7c9;display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                    <i data-feather="circle" style="width:11px;height:11px;"></i> One number
+                </div>
+                <div class="req-item" id="req4"
+                    style="font-size:11.5px;color:#b0b7c9;display:flex;align-items:center;gap:6px;">
+                    <i data-feather="circle" style="width:11px;height:11px;"></i> One special character
+                </div>
+            </div>
+
+            <button type="submit" class="btn-update-pwd" id="pwdBtn">
+                <i data-feather="key" style="width:15px;height:15px;"></i>
+                Update Password
+            </button>
+
+            <div class="info-note">
+                <i data-feather="info" style="width:11px;height:11px;"></i>
+                You'll stay logged in after changing your password.
             </div>
         </form>
     </div>
+
 </div>
+
+<script>
+    function togglePwd(id, btn) {
+        const inp = document.getElementById(id);
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+        btn.innerHTML = inp.type === 'text'
+            ? '<i data-feather="eye-off" style="width:15px;height:15px;"></i>'
+            : '<i data-feather="eye" style="width:15px;height:15px;"></i>';
+        if (window.feather) feather.replace();
+    }
+
+    function checkStr(val) {
+        const rules = [
+            val.length >= 8,
+            /[A-Z]/.test(val),
+            /[0-9]/.test(val),
+            /[^A-Za-z0-9]/.test(val)
+        ];
+        const score = rules.filter(Boolean).length;
+        const colors = ['#ef4444', '#f59e0b', '#3b82f6', '#22c55e'];
+        const labels = ['Weak — try harder', 'Fair — getting better', 'Good — almost there', 'Strong — great!'];
+
+        ['s1', 's2', 's3', 's4'].forEach((id, i) => {
+            document.getElementById(id).style.background = i < score
+                ? (colors[score - 1] || '#eef0f8')
+                : '#eef0f8';
+        });
+
+        const lbl = document.getElementById('strLbl');
+        lbl.textContent = val.length === 0 ? 'Enter a strong password' : (labels[score - 1] || 'Weak — try harder');
+        lbl.style.color = val.length === 0 ? '#b0b7c9' : (colors[score - 1] || '#ef4444');
+
+        // Req icons
+        const reqIds = ['req1', 'req2', 'req3', 'req4'];
+        rules.forEach((ok, i) => {
+            const el = document.getElementById(reqIds[i]);
+            el.style.color = ok ? '#22c55e' : '#b0b7c9';
+            el.querySelector('i').setAttribute('data-feather', ok ? 'check-circle' : 'circle');
+        });
+        if (window.feather) feather.replace();
+    }
+
+    function checkMatch() {
+        const nv = document.getElementById('id_new').value;
+        const cv = document.getElementById('id_conf').value;
+        const h = document.getElementById('matchHint');
+        const btn = document.getElementById('pwdBtn');
+        if (!cv) { h.style.display = 'none'; return; }
+        h.style.display = 'block';
+        if (nv === cv) {
+            h.textContent = '✓ Passwords match';
+            h.style.color = '#22c55e';
+            btn.disabled = false;
+        } else {
+            h.textContent = '✗ Passwords do not match';
+            h.style.color = '#ef4444';
+            btn.disabled = true;
+        }
+    }
+
+    document.getElementById('pwdForm').addEventListener('submit', function (e) {
+        const nv = document.getElementById('id_new').value;
+        const cv = document.getElementById('id_conf').value;
+        if (nv !== cv || nv.length < 8) {
+            e.preventDefault();
+            alert(nv.length < 8 ? 'Password must be at least 8 characters.' : 'Passwords do not match.');
+        }
+    });
+</script>
 {% endblock %}
